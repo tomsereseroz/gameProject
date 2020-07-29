@@ -392,7 +392,7 @@ function loop(){
 
 //start of runtime code
 
-let context = document.getElementById("gb").getContext("2d");
+let context = document.getElementById("gb").getContext("2d", { alpha: false });
 //context types are "2d", "webgl", "webgl2", and "bitmaprenderer" 
 //"2d" makes context an instance of "CanvasRenderingContext2D" which is a part of the canvas API
 
