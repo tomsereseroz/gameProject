@@ -4,7 +4,7 @@ import utils from './gameUtils.js';
 console.log('game.js');
 
 let numpads = 0;
-
+//test
 function gamepadConnect(event) {
   var gamepad = event.gamepad;
   console.log(gamepad);
