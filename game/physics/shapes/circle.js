@@ -28,8 +28,8 @@ class Circle extends Shape {
     }
 
     collidesWith(other) {
-        if (other instanceof Circle) isColisionCC(other)
-        else if (other instanceof Rectangle) this.isCollisionCR(other)
+        if (other instanceof Circle) Shape.isColisionCC(other)
+        else if (other instanceof Rectangle) Shape.isCollisionCR(other)
         else; // Should throw an error
 
     }

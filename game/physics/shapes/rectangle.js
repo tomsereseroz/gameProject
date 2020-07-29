@@ -26,8 +26,8 @@ class Rectangle extends Shape {
     }
 
     collidesWith(other) {
-        if (other instanceof Circle) this.isCollisionCR(other)
-        else if (other instanceof Rectangle) this.isCollisionRR(other)
+        if (other instanceof Circle) Shape.isCollisionCR(other)
+        else if (other instanceof Rectangle) Shape.isCollisionRR(other)
         else;  // Should throw an error
 
     }
