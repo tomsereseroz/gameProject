@@ -16,8 +16,7 @@ class Vector {
     }
 
     get unitVector() {
-        let m = magnitude;
-        return Vector(dx / m, dy / m);
+        return Vector(dx / magnitude, dy / magnitude);
     }
 
     scale(factor) {
