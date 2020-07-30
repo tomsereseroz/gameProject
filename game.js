@@ -33,7 +33,7 @@ function keyDownHandler(event){
     switch(event.keyCode){
       case 27:
         gamePaused = 1;
-        document.getElementById("pauseMenu").style = "display: flex;"
+        document.getElementById("pauseMenu").style = "display: flex;"//this displays the pause menu that's hidden by default
         break;
       case 65:
         keysdown[0] = 1;
@@ -437,7 +437,7 @@ let axes = [];
 let buttons = {};
 let projArray = new projectileArray;
 let entArray = new entityArray;
-let player = entArray.add(new Entity).setPosition([3*width/4,3*height/4]).setShape(shapes.Circle).setType(9999).setMass(1000).setFriction(.05).setProperties([40]).setAim([0,0]).setHP(60);
+let player = entArray.add(new Entity).setPosition([width/2,height/2]).setShape(shapes.Circle).setType(9999).setMass(1000).setFriction(.05).setProperties([40]).setAim([0,0]).setHP(60);
 let heartImg = document.getElementById("heart");
 let emptyheartImg = document.getElementById("emptyheart");
 let playergun = new gun;
