@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head><!-- This is html for the 'head' (tab) of the browser -->
+<head><!-- This is html for the 'head' (tab) of the browser  document.getElementById('pauseMenu')-->
 	<title>Game Dev!</title>
 	<link rel="icon" href="./assets/40x36heart.png"/>
 </head>
+<script type='module' src="game.js"></script>
 <body>
 	<img id="heart" src="./assets/40x36heart.png"/>
 	<img id="emptyheart" src="./assets/40x36emptyheart.png"/>
@@ -14,14 +15,17 @@
 		<canvas id="background-layer" width="480" height="320"></canvas>
 	</div>
 	<div id ="mainMenu">
-		<button type="button" onclick="console.log('hello!'); document.getElementById('mainMenu').style = 'display:none;';">Adventure</button>
-		<button type="button" onclick="console.log('wow!'); document.getElementById('mainMenu').style = 'display:none;';">Endless</button>
+		<button type="button" onclick="this.parentElement.style = 'display:none;';">Adventure</button>
+		<button type="button" onclick="this.parentElement.style = 'display:none;';">Endless</button>
 	</div>
-	<script type='module' src="game.js"></script>
+	<div id ="pauseMenu">
+		<button type="button" onclick="this.parentElement.style = 'display:none;';" >Resume</button>
+		<button type="button" onclick="this.parentElement.style = 'display:none;';">Main Menu</button>
+	</div>
 </body>
 
 <style>
-		* {padding: 0; margin: 0;}
+		* {padding: 0; margin: 0; }
 
 		img {display: none;}
 
@@ -33,24 +37,34 @@
   	}
 
 		canvas { position: absolute; }
-		#mainMenu{ 
+		#mainMenu, #pauseMenu { 
 			z-index: 4; 
 			position: absolute; 
 			display: flex;
 			flex-direction: column;
-			background-color:darkgreen;
+			background-color:rgba(50,128,128,0.8);
 			top: 50%;
 			left: 50%;
    		transform: translate(-50%, -50%);
 		}
+		
 		button {
+			font-weight: bold;
 			font-size: 4em;
 			padding: 25px;
 			margin: 20px;
 			border-radius: 5px;
 			border-color: rgb(223, 204, 32);
-			background-color:darkslateblue;
+			background-color:rgba(80,80,90,0.8);
 			user-select: none;
+		}
+
+		#pauseMenu {
+			font-size: 0.5em;
+			display: none;
+		}
+		button:hover {
+			background-color:rgba(120,120,140,0.8);
 		}
 		#ui-layer { z-index: 3; }
 		#game-layer { z-index: 2; }

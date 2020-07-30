@@ -16,6 +16,7 @@ function gamepadConnect(event) {
 
 window.addEventListener("gamepadconnected", function(e) { gamepadConnect(e); });
 window.addEventListener("gamepaddisconnected", function() { numpads-- });
+document.getElementById("pauseMenu").children[0].addEventListener("click", () => {gamePaused = 0;} );
 document.onkeydown = keyDownHandler;
 document.onkeyup = keyUpHandler;
 document.onmousemove = function(e){
@@ -30,6 +31,10 @@ function keyDownHandler(event){
     keysdown[event.keyCode-37] = 1;
   }else
     switch(event.keyCode){
+      case 27:
+        gamePaused = 1;
+        document.getElementById("pauseMenu").style = "display: flex;"
+        break;
       case 65:
         keysdown[0] = 1;
         break;
@@ -162,11 +167,11 @@ class Projectile extends physObj{//projectiles handle collision with entities
     super();
     this.damage = 1;
     this.startTime = time;
-    this.timeout = 1000;
+    this.timeout = 60;
   }
   setDamage(damage){this.damage = damage; return this;}
   setTimeout(timeout){this.timeout = timeout; return this;}
-  checkTimeout(){return this.startTime + this.timeout < time;} 
+  checkTimeout(){return !this.timeout--;} 
 }
 
 class Entity extends physObj{//entities are for things that aim in a certaian direction and have health
@@ -222,7 +227,7 @@ class gun{
     this.shotSize = 10;
     this.shotMass = 5;
     this.shotFriction = 0;
-    this.timeout = 3000;
+    this.timeout = 180;
   }
   setType(type){this.type = type; return this;}
   canShoot(){return time - this.lastShotTime > this.delay;}
@@ -333,7 +338,6 @@ function checkButton(button,index){
 }
 
 function loop(){
-  time = Date.now();
   height = document.documentElement.clientHeight;
   width = document.documentElement.clientWidth;
   if(lastheight!= height || lastwidth != width){//not optimal
@@ -343,8 +347,13 @@ function loop(){
   }
   lastheight = height;
   lastwidth = width;
-  context.fillStyle = grd;//"linear-gradient(to bottom right, #afe569 0%, #207cca 78%, #3b5b83 100%)";
-  context.fillRect(0,0,width,height);
+
+  time = Date.now();
+  if(gamePaused||time-lasttime<framerate){
+    window.requestAnimationFrame(loop);
+    return;
+  }
+  
   
   if(numpads){//gamepad control section
     const gamepads = navigator.getGamepads();
@@ -373,10 +382,15 @@ function loop(){
       player.shootGun(player.aim.map(x => x*15));
     }
   }
+
+  context.fillStyle = grd;//"linear-gradient(to bottom right, #afe569 0%, #207cca 78%, #3b5b83 100%)";
+  context.fillRect(0,0,width,height);
+  lasttime = time;
   entArray.Draw();
   projArray.Draw();
-  projArray.Tick();   
+  projArray.Tick();
   entArray.Tick();
+
   utils.screenWrap(player,width,height);
   if(entArray.array.length < 15){
     let enemy = entArray.add(new Entity).setType(0).setProperties([70]).setMass(30).setHP(100).setShape(shapes.Circle).setPosition([Math.random()*width,Math.random()*height]);
@@ -386,8 +400,9 @@ function loop(){
   }
   context.drawImage(heartImg, 10, 10);
   context.drawImage(heartImg, 55, 10);
-  context.drawImage(emptyheartImg, 100, 10);
+  context.drawImage(emptyheartImg, 100, 10); 
   window.requestAnimationFrame(loop);
+  
 }
 
 //start of runtime code
@@ -410,13 +425,14 @@ let canvasRect = document.getElementById("gb").getBoundingClientRect();
 
 let mouseX = 0;
 let mouseY = 0;
-let cutoff = 0.04;
+let cutoff = 0.05;
 //controller deadzone cutoff.
 
 let keysdown = [0,0,0,0];//for < ^ > v movement, in that order
 let mousedown = 0;
 let time = Date.now();
-
+let lasttime = time;
+let framerate = 1000/70;
 let axes = [];
 let buttons = {};
 let projArray = new projectileArray;
@@ -428,5 +444,5 @@ let playergun = new gun;
 playergun.setType(9999);// I set the player type to 9999. default is 0
 //projectiles marked 9999 are assumed to originate from the player and only hurt enemies
 player.setGun(playergun);
-
+var gamePaused = 0;
 loop();
