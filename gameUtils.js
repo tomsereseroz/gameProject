@@ -1,9 +1,9 @@
 import d2 from './2DUtils.js';
-
+import Vector from './physics/vector.js';
 export default {
 
 createPlayerGradient(player,context,time){
-  let playergrd = context.createRadialGradient(player.pos[0], player.pos[1], 5, player.pos[0], player.pos[1],40);
+  let playergrd = context.createRadialGradient(player.pos.x, player.pos.y, 5, player.pos.x, player.pos.y,40);
   playergrd.addColorStop(0, "purple");
   playergrd.addColorStop(.4+.3*Math.sin(2*time*Math.PI/2000), "black");
   playergrd.addColorStop(.8+.1*Math.sin(2*time*Math.PI/3000), "red");
@@ -12,7 +12,7 @@ createPlayerGradient(player,context,time){
 },
 
 getHPStyle(entity,context){
-  let grd = context.createRadialGradient(entity.pos[0], entity.pos[1], 2,entity.pos[0],entity.pos[1],entity.props[0]);
+  let grd = context.createRadialGradient(entity.pos.x, entity.pos.y, 2,entity.pos.x,entity.pos.y,entity.props[0]);
   grd.addColorStop(0, "white");
   grd.addColorStop(entity.health/101, "red");
   grd.addColorStop(1, "black");
@@ -28,11 +28,11 @@ createBGgradient(context,width){
 },
 
 aimAtCoords(entity,pos){
-  let dist = d2.distance(entity.pos,pos);
-  let factor = d2.toRadius(dist);
+  let dist = Vector.fromPositions(entity.pos,pos);
+  let factor = dist.magnitude;
   factor = Math.min(factor/500, 1);
-  dist = d2.makeUnitVector(dist);
-  entity.aim = dist.map(x => x*factor);
+  dist = dist.unitVector;
+  entity.aim = dist.scale(factor);
 },
 
 aMoveAtB(a,b){
@@ -56,9 +56,9 @@ moveApart(first, second){
 drawAimIndicator(entity,context){
   context.beginPath();
   context.strokeStyle = "pink";
-  context.moveTo(entity.pos[0],entity.pos[1]);
+  context.moveTo(entity.pos.x,entity.pos.y);
   context.lineWidth = 10;
-  context.lineTo(entity.pos[0]+entity.aim[0]*40,entity.pos[1]+entity.aim[1]*40);
+  context.lineTo(entity.pos.x+entity.aim.dx*40,entity.pos.y+entity.aim.dy*40);
   context.stroke();
 },
 

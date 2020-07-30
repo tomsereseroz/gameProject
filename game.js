@@ -1,5 +1,7 @@
 import d2 from './2DUtils.js';
 import utils from './gameUtils.js';
+import Vector from './physics/vector.js';
+import position from './physics/position.js'
 
 console.log('game.js');
 
@@ -27,24 +29,29 @@ document.onmousedown = function() { mousedown = 1; };
 document.onmouseup =   function() { mousedown = 0; };
 
 function keyDownHandler(event){
-  if(event.keyCode >= 37 && event.keyCode <= 40){
+  if(event.keyCode >= 37 && event.keyCode <= 40){//< ^ > v arrow keys
     keysdown[event.keyCode-37] = 1;
   }else
     switch(event.keyCode){
-      case 27:
+      case 27://esc key
+        if(!gamePaused){
         gamePaused = 1;
         document.getElementById("pauseMenu").style = "display: flex;"//this displays the pause menu that's hidden by default
+        }else{
+        gamePaused = 0;
+        document.getElementById("pauseMenu").style = "display: none;"//this displays the pause menu that's hidden by default
+        }
         break;
-      case 65:
+      case 65://a
         keysdown[0] = 1;
         break;
-      case 87:
+      case 87://w
         keysdown[1] = 1;
         break;
-      case 68:
+      case 68://d
         keysdown[2] = 1;
         break;
-      case 83:
+      case 83://s
         keysdown[3] = 1;
         break;
       default:
@@ -83,14 +90,14 @@ const shapes = {
 
 class Object{
   constructor(){
-    this.pos = [0,0];//position [x,y]
+    this.pos = new position(0,0);//position [x,y]
     this.shape = shapes.Circle;//enumerated shape
     this.props = [];//array of shape properties (width, radius, etc).
     this.style = "black";//fillStyle
   }
   setStyle(style){this.style = style; return this;}
   setShape(shape){this.shape = shape; return this;}
-  setPosition([x,y]){this.pos = [x,y]; return this;}
+  setPosition([x,y]){this.pos.x = x; this.pos.y = y; return this;}
   setProperties(props){this.props = props; return this;}
   Draw(){
     switch(this.shape){
@@ -112,12 +119,12 @@ class Object{
 class physObj extends Object{
   constructor(){//maybe add acceleration to this later
     super();//calls Object()
-    this.vel = [0,0];//velocity [vx, vy]
+    this.vel = new Vector(0,0);//velocity [vx, vy]
     this.type = 0;//type for collisions(collisions are ignored for similar types)
     this.mass = 1;//mass
     this.friction = .1;//friction constant should be 0 to 1.
   }
-  setVelocity(vel){this.vel = vel; return this;}
+  setVelocity(vel){this.vel.x = vel[0]; this.vel.y = vel[1]; return this;}
   setType(type){this.type = type; return this;}
   setMass(mass){this.mass = mass; return this;}
   setFriction(friction){this.friction = friction; return this;}
@@ -177,11 +184,11 @@ class Projectile extends physObj{//projectiles handle collision with entities
 class Entity extends physObj{//entities are for things that aim in a certaian direction and have health
   constructor(){
     super();
-    this.aim = [0,0];//aim [ax, ay]
+    this.aim = new Vector(0,0);//aim [ax, ay]
     this.health = 10;
     this.gun = 0;//delay in ms between shots
   }
-  setAim(aim){this.aim = aim; return this;}
+  setAim(aim){this.aim.dx = aim[0]; this.aim.dy = aim[1]; return this;}
   setHP(health){this.health = health; return this;}
   setGun(gun){this.gun = gun; return this;}
   shootGun(vel){this.gun.Shoot(this.pos,vel); return this;}
@@ -191,8 +198,8 @@ class Entity extends physObj{//entities are for things that aim in a certaian di
   }
   conserveMomentum(source){
     let mtot = this.mass+source.mass;
-    this.vel[0] = this.mass*this.vel[0]/mtot + source.vel[0]*source.mass/mtot;
-    this.vel[1] = this.mass*this.vel[1]/mtot + source.vel[1]*source.mass/mtot;
+    this.vel.x = this.mass*this.vel.x/mtot + source.vel.x*source.mass/mtot;
+    this.vel.y = this.mass*this.vel.y/mtot + source.vel.y*source.mass/mtot;
     return this;
   }
   damage(source){this.health-=source.damage; return this;}
@@ -349,7 +356,7 @@ function loop(){
   lastwidth = width;
 
   time = Date.now();
-  if(gamePaused||time-lasttime<framerate){
+  if(gamePaused||time-lasttime<framerate){//this resets the loop if the game is paused or if the loop is run at more than 70fps
     window.requestAnimationFrame(loop);
     return;
   }
@@ -373,11 +380,12 @@ function loop(){
   }else{//mouse and keyboard
     //move
     if(keysdown != [0,0,0,0]){
-      player.vel[0] += keysdown[2] - keysdown[0];
-      player.vel[1] += keysdown[3] - keysdown[1];
+      player.vel.x += keysdown[2] - keysdown[0];
+      player.vel.y += keysdown[3] - keysdown[1];
     }
     //aim
-    utils.aimAtCoords(player,[mouseX, mouseY]);
+    let mousePos = new position(mouseX,mouseY);
+    utils.aimAtCoords(player,mousePos);
     if(mousedown){
       player.shootGun(player.aim.map(x => x*15));
     }

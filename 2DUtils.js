@@ -1,16 +1,16 @@
 export default {
 
-distance(pos1,pos2){
+distance(pos1,pos2){//frompositions
   let dx = pos2[0]-pos1[0];
   let dy = pos2[1]-pos1[1];
   return [dx, dy];
 },
 
-toRadius([dx, dy]){
+toRadius([dx, dy]){//magnitude
   return Math.sqrt(dx*dx + dy*dy);
 },
 
-makeUnitVector([x,y]){
+makeUnitVector([x,y]){//unitVector
   let h = Math.sqrt(x*x+y*y);
   return [x/h, y/h];
 },
