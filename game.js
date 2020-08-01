@@ -1,5 +1,6 @@
 import d2 from './2DUtils.js';
 import utils from './gameUtils.js';
+import Sound from './sound.js';
 
 console.log('game.js');
 
@@ -180,10 +181,12 @@ class Entity extends physObj{//entities are for things that aim in a certaian di
     this.aim = [0,0];//aim [ax, ay]
     this.health = 10;
     this.gun = 0;//delay in ms between shots
+    this.deathAudio;
   }
   setAim(aim){this.aim = aim; return this;}
   setHP(health){this.health = health; return this;}
   setGun(gun){this.gun = gun; return this;}
+  setAudio(audio){this.deathAudio = audio; return this;}
   shootGun(vel){this.gun.Shoot(this.pos,vel); return this;}
   Tick(){
     this.Move();
@@ -220,7 +223,7 @@ class Entity extends physObj{//entities are for things that aim in a certaian di
 class gun{
   constructor(){
     this.type = 0;
-    this.delay = 1;
+    this.delay = 100;
     this.lastShotTime = time;
     this.damage = 10;
     this.shotSpeed = 100;
@@ -234,6 +237,7 @@ class gun{
   Shoot(pos, vel){
     if(this.canShoot()){
       this.lastShotTime = time;
+      soundArray[soundArrayindex++%10].play();
       projArray.add(new Projectile).setType(this.type).setDamage(this.damage).setFriction(this.shotFriction).setMass(this.shotMass).setPosition(pos).setVelocity(vel).setTimeout(this.timeout).setShape(shapes.Circle).setProperties([this.shotSize]);
       //projArray.Display();
     }
@@ -282,6 +286,7 @@ class projectileArray extends objectArray{
           if(this.array[i].collidesWith(entArray.array[j])&&this.array[i].type!=entArray.array[j].type){
             entArray.array[j].damage(this.array[i]).conserveMomentum(this.array[i]);
             if(entArray.array[j].checkHP()){
+              entArray.array[j].deathAudio.play();
               entArray.array.splice(j,1);
               j--
             }
@@ -380,6 +385,7 @@ function loop(){
     utils.aimAtCoords(player,[mouseX, mouseY]);
     if(mousedown){
       player.shootGun(player.aim.map(x => x*15));
+      //soundArray[soundArrayindex++%10].play();
     }
   }
 
@@ -392,8 +398,8 @@ function loop(){
   entArray.Tick();
 
   utils.screenWrap(player,width,height);
-  if(entArray.array.length < 15){
-    let enemy = entArray.add(new Entity).setType(0).setProperties([70]).setMass(30).setHP(100).setShape(shapes.Circle).setPosition([Math.random()*width,Math.random()*height]);
+  if(entArray.array.length < 5){
+    let enemy = entArray.add(new Entity).setType(0).setProperties([70]).setMass(30).setHP(100).setShape(shapes.Circle).setPosition([Math.random()*width,Math.random()*height]).setAudio(new Audio('./assets/clink.wav'));
     while(d2.toRadius(d2.distance(player.pos, enemy.pos))<300){
       enemy.setPosition([Math.random()*width,Math.random()*height]);
     };
@@ -427,7 +433,11 @@ let mouseX = 0;
 let mouseY = 0;
 let cutoff = 0.05;
 //controller deadzone cutoff.
-
+let soundArray = [];
+for(let i = 0; i<10; i++){
+  soundArray[i] = new Sound('./assets/clearpop.wav')
+}
+let soundArrayindex = 0;
 let keysdown = [0,0,0,0];//for < ^ > v movement, in that order
 let mousedown = 0;
 let time = Date.now();
