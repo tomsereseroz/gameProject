@@ -1,5 +1,5 @@
-class gun {
-    constructor(projectileArry, shotDelay = 100, damage = 10, shotSpeed = 100, shotSize = 10, shotMass = 5, shotFriction = 0, collisionType = CollisionType.default, timeoutDuration = 3000) {
+export default class Gun {
+    constructor({projectileArry, shotDelay, time, damage, shotSpeed, shotSize, shotMass, shotFriction, collisionType, timeoutDuration}) {
         this.projectileArry = projectileArry;
 
         this.shotDelay = shotDelay;
@@ -17,7 +17,7 @@ class gun {
 
     get canShoot() { return this.timeSinceLastShot > this.delay }
 
-    Shoot(position, velocity) {
+    shoot(position, velocity) {
         if (this.canShoot) {
             this.lastShotTime = time;
 

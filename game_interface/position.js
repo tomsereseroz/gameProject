@@ -1,4 +1,4 @@
-class Position {
+export default class Position {
     constructor(x, y) {
         this.x = x;
         this.y = y;
@@ -12,6 +12,13 @@ class Position {
     changePosition(x, y){
         this.x = x;
         this.y = y;
+    }
+
+    distanceTo(other) {
+        let dx = other.x - this.x;
+        let dy = other.y - this.y;
+
+        return Math.hypot(dx, dy);
     }
 
 }

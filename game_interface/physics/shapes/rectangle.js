@@ -1,6 +1,8 @@
-class Rectangle extends Shape {
-    constructor(position, velocity, mass, friction, collisionType, style, height, width) {
-        super(position, velocity, mass, friction, collisionType, style);
+import Shape from './physics/shape.js';
+
+export default class Rectangle extends Shape {
+    constructor({position, velocity, mass, friction, collisionType, style, height=5, width=5}) {
+        super({position, velocity, mass, friction, collisionType, style});
         this.height = height;
         this.width = width;
     }
@@ -26,8 +28,8 @@ class Rectangle extends Shape {
     }
 
     collidesWith(other) {
-        if (other instanceof Circle) Shape.isCollisionCR(other)
-        else if (other instanceof Rectangle) Shape.isCollisionRR(other)
+        if (other instanceof Circle) return Shape.isCollisionCR(other)
+        else if (other instanceof Rectangle) return Shape.isCollisionRR(other)
         else;  // Should throw an error
 
     }

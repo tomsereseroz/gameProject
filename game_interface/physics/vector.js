@@ -1,4 +1,4 @@
-class Vector {
+export default class Vector {
     constructor(dx, dy) {
         this.dx = dx;
         this.dy = dy;
@@ -12,7 +12,7 @@ class Vector {
     }
 
     get magnitude() {
-        return Math.sqrt(dx * dx + dy * dy);
+        return Math.hypot(dx, dy);
     }
 
     get unitVector() {
@@ -22,6 +22,11 @@ class Vector {
     scale(factor) {
         dx *= factor;
         dy *= factor;
+    }
+
+    addVector(otherVector) {
+        this.dx += otherVector.dx;
+        this.dy += otherVector.dy;
     }
 
 }

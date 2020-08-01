@@ -1,6 +1,8 @@
-class ProjectileArray extends GameObjectArray {
-    tick() {
+import GameObjectArray from './game_object_array.js';
 
+export default class ProjectileArray extends GameObjectArray {
+
+    tick() {
         var deleted = false;
 
         for (var i = 0; i < this.array.length; i++) {
@@ -36,10 +38,5 @@ class ProjectileArray extends GameObjectArray {
             } else this.array[i].tick();
         }
     }
-
-    draw() {
-        for (var i = 0; i < this.array.length; i++) {
-            this.array[i].draw();
-        }
-    }
+    
 }

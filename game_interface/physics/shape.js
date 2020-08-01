@@ -1,6 +1,9 @@
-class Shape {
+import Vector from './physics/position.js';
+import CollisionType from './physics/position.js';
 
-    constructor(position = Vector(0, 0), velocity = Vector(0, 0), mass = 1, friction = .1, collisionType = CollisionType.default, style = "black") {//maybe add acceleration to this later
+export default class Shape {
+
+    constructor({position = Vector(0, 0), velocity = Vector(0, 0), mass = 1, friction = .1, collisionType = CollisionType.default, style = "black"}) {//maybe add acceleration to this later
         
         this.position = position;
 
@@ -30,21 +33,23 @@ class Shape {
             && first.bottom > second.top);
     }
 
-    static isCollisionCR(first, second) {
+    // static isCollisionCR(first, second) {
 
-        distanceVector = Vector(first.position, second.position);
-        distanceVector.dx = Math.abs(distanceVector.dx);
-        distanceVector.dy = Math.abs(distanceVector.dy);
-        dx = clamp(0, second.props[0] / 2, dx);
-        dy = clamp(0, second.props[1] / 2, dy);
-        // return(
-        //   this.toRadius(
+    //     distanceVector = Vector(first.position, second.position);
+    //     distanceVector.dx = Math.abs(distanceVector.dx);
+    //     distanceVector.dy = Math.abs(distanceVector.dy);
+    //     dx = clamp(0, second.props[0] / 2, dx);
+    //     dy = clamp(0, second.props[1] / 2, dy);
 
-        //     this.distance(first.pos, [cx+dx,cy+dy]  < first.props[0])
 
-        //     )
+    //     return(
+    //       this.toRadius(
 
-        //   );
-    }
+    //         this.distance(first.pos, [cx+dx,cy+dy]  < first.props[0])
+
+    //         )
+
+    //       );
+    // }
 
 }

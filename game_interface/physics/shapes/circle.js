@@ -1,15 +1,17 @@
-class Circle extends Shape {
+import Shape from './physics/shape.js';
 
-    constructor(position, velocity, mass, friction, collisionType, style, radius) {
-        super(position, velocity, mass, friction, collisionType, style);
+export default class Circle extends Shape {
+
+    constructor({position, velocity, mass, friction, collisionType, style, radius = 10}) {
+        super({position, velocity, mass, friction, collisionType, style});
         this.radius = radius;
     }
 
-    get isOffScreen() {
+    get isOffScreen(interface) {
         return (this.right < 0
-            || this.left > SCREENWIDTH
+            || this.left > interface.width
             || this.bottom < 0
-            || this.top > SCREENHEIGHT);
+            || this.top > interface.height);
 
     }
 
