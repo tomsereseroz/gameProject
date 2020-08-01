@@ -1,6 +1,7 @@
 class Shape {
 
     constructor(position = Vector(0, 0), velocity = Vector(0, 0), mass = 1, friction = .1, collisionType = CollisionType.default, style = "black") {//maybe add acceleration to this later
+        
         this.position = position;
 
         this.style = style;

@@ -3,71 +3,8 @@ import utils from './gameUtils.js';
 
 console.log('game.js');
 
-let numpads = 0;
 
-function gamepadConnect(event) {
-  var gamepad = event.gamepad;
-  console.log(gamepad);
-  console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
-    event.gamepad.index, event.gamepad.id,
-    event.gamepad.buttons.length, event.gamepad.axes.length);
-  numpads++;
-}
 
-window.addEventListener("gamepadconnected", function (e) { gamepadConnect(e); });
-window.addEventListener("gamepaddisconnected", function () { numpads-- });
-document.onkeydown = keyDownHandler;
-document.onkeyup = keyUpHandler;
-document.onmousemove = function (e) {
-  mouseX = e.clientX - canvasRect.x;
-  mouseY = e.clientY - canvasRect.y;
-};
-document.onmousedown = function () { mousedown = 1; };
-document.onmouseup = function () { mousedown = 0; };
-
-function keyDownHandler(event) {
-  if (event.keyCode >= 37 && event.keyCode <= 40) {
-    keysdown[event.keyCode - 37] = 1;
-  } else
-    switch (event.keyCode) {
-      case 65:
-        keysdown[0] = 1;
-        break;
-      case 87:
-        keysdown[1] = 1;
-        break;
-      case 68:
-        keysdown[2] = 1;
-        break;
-      case 83:
-        keysdown[3] = 1;
-        break;
-      default:
-        break;
-    }
-}
-
-function keyUpHandler(event) {
-  if (event.keyCode >= 37 && event.keyCode <= 40) {
-    keysdown[event.keyCode - 37] = 0;
-  } else
-    switch (event.keyCode) {
-      case 65:
-        keysdown[0] = 0;
-        break;
-      case 87:
-        keysdown[1] = 0;
-        break;
-      case 68:
-        keysdown[2] = 0;
-        break;
-      case 83:
-        keysdown[3] = 0;
-        break;
-      default:
-        break;
-    }
-}
 
 function drawButton(button, index) {
   context.fillStyle = "black";
@@ -161,8 +98,7 @@ let grd = utils.createBGgradient(context, width);
 
 let canvasRect = document.getElementById("gb").getBoundingClientRect();
 
-let mouseX = 0;
-let mouseY = 0;
+
 let cutoff = 0.04;
 let keysdown = [0, 0, 0, 0];
 let mousedown = 0;

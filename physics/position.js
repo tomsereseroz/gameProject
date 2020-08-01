@@ -9,4 +9,9 @@ class Position {
         this.y += other.dy;
     }
 
+    changePosition(x, y){
+        this.x = x;
+        this.y = y;
+    }
+
 }
