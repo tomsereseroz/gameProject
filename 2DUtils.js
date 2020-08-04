@@ -1,8 +1,8 @@
 export default {
 
-distance(pos1,pos2){//frompositions
-  let dx = pos2[0]-pos1[0];
-  let dy = pos2[1]-pos1[1];
+distance(pos1,pos2){//from positions
+  let dx = pos2.x-pos1.x;
+  let dy = pos2.y-pos1.y;
   return [dx, dy];
 },
 
@@ -25,7 +25,7 @@ return(first.x<second.x+second.props[0] && first.x + first.props[0] > second.x &
 },
 
 isCRCollision(first,second){//checks a circle-rectangle collision (second is rectangle)
-  let [cx, cy] = [second.pos[0]+second.props[0]/2, second.pos[1]+second.props[1]/2];
+  let [cx, cy] = [second.pos.x+second.props[0]/2, second.pos.y+second.props[1]/2];
   let [dx, dy] = distance(first.pos,[cx,cy]);//distance from center of circle to center of rectangle
   dx = Math.abs(dx);
   dy = Math.abs(dy);

@@ -11,7 +11,7 @@ export default class Vector {
       return new Vector(dx, dy);
   }
 
-  get magnitude() {
+  get magnitude() {//math.hypot
       return Math.sqrt(this.dx * this.dx + this.dy * this.dy);
   }
 

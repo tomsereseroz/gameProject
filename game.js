@@ -18,6 +18,17 @@ function gamepadConnect(event) {
 
 window.addEventListener("gamepadconnected", function(e) { gamepadConnect(e); });
 window.addEventListener("gamepaddisconnected", function() { numpads-- });
+window.addEventListener("resize",() =>{
+  height = document.documentElement.clientHeight;
+  width = document.documentElement.clientWidth;
+  grd = utils.createBGgradient(bgcontext,width);
+  bgcontext.canvas.height = height;
+  bgcontext.canvas.width = width;
+  context.canvas.height = height;
+  context.canvas.width = width;
+  bgcontext.fillStyle = grd;//"linear-gradient(to right, #afe569 0%, #207cca 78%, #3b5b83 100%)";
+  bgcontext.fillRect(0,0,width,height);
+});
 document.getElementById("pauseMenu").children[0].addEventListener("click", () => {gamePaused = 0;} );
 document.onkeydown = keyDownHandler;
 document.onkeyup = keyUpHandler;
@@ -97,13 +108,13 @@ class Object{
   }
   setStyle(style){this.style = style; return this;}
   setShape(shape){this.shape = shape; return this;}
-  setPosition([x,y]){this.pos.x = x; this.pos.y = y; return this;}
+  setPosition(pos){this.pos = pos; return this;}
   setProperties(props){this.props = props; return this;}
   Draw(){
     switch(this.shape){
       case shapes.Circle:
         context.beginPath();
-        context.arc(this.pos[0],this.pos[1],this.props[0],0,2*Math.PI);
+        context.arc(this.pos.x,this.pos.y,this.props[0],0,2*Math.PI);
         context.fillStyle = this.style;
         context.fill();
         break;
@@ -124,15 +135,15 @@ class physObj extends Object{
     this.mass = 1;//mass
     this.friction = .1;//friction constant should be 0 to 1.
   }
-  setVelocity(vel){this.vel.x = vel[0]; this.vel.y = vel[1]; return this;}
+  setVelocity(vel){this.vel.dx = vel.dx; this.vel.dy = vel.dy; return this;}
   setType(type){this.type = type; return this;}
   setMass(mass){this.mass = mass; return this;}
   setFriction(friction){this.friction = friction; return this;}
   Tick(){//updates position based on velocity and applies a damping to velocity
-    this.pos[0] = this.pos[0] + this.vel[0];
-    this.pos[1] = this.pos[1] + this.vel[1];
-    this.vel[0] *= 1 - this.friction;
-    this.vel[1] *= 1 - this.friction;
+    this.pos.x = this.pos.x + this.vel.dx;
+    this.pos.y = this.pos.y + this.vel.dy;
+    this.vel.dx *= 1 - this.friction;
+    this.vel.dy *= 1 - this.friction;
   }
   collidesWith(other){//checks collision with another object. returns 1 if collided.
     switch(this.shape){
@@ -159,9 +170,9 @@ class physObj extends Object{
   isOffScreen(){
     switch(this.shape){
       case shapes.Circle:
-        return this.pos[0]+this.props[0] < 0 || this.pos[0]-this.props[0] > width || this.pos[1]+this.props[0] < 0 || this.pos[1]-this.props[0] > height;
+        return this.pos.x+this.props[0] < 0 || this.pos.x-this.props[0] > width || this.pos.y+this.props[0] < 0 || this.pos.y-this.props[0] > height;
       case shapes.Rectangle:
-        return this.pos[0]+this.props[0] < 0 || this.pos[0] > width || this.pos[1] + this.props[1] < 0 || this.pos[1] > height;
+        return this.pos.x+this.props[0] < 0 || this.pos.x > width || this.pos.y + this.props[1] < 0 || this.pos.y > height;
     }
   }
   Draw(){
@@ -191,7 +202,7 @@ class Entity extends physObj{//entities are for things that aim in a certaian di
   setAim(aim){this.aim.dx = aim[0]; this.aim.dy = aim[1]; return this;}
   setHP(health){this.health = health; return this;}
   setGun(gun){this.gun = gun; return this;}
-  shootGun(vel){this.gun.Shoot(this.pos,vel); return this;}
+  shootGun(vel){this.gun.Shoot({...this.pos},vel); return this;}
   Tick(){
     this.Move();
     super.Tick();
@@ -345,15 +356,15 @@ function checkButton(button,index){
 }
 
 function loop(){
-  height = document.documentElement.clientHeight;
-  width = document.documentElement.clientWidth;
-  if(lastheight!= height || lastwidth != width){//not optimal
-    grd = utils.createBGgradient(context,width);
-    context.canvas.height = height;
-    context.canvas.width = width;
-  }
-  lastheight = height;
-  lastwidth = width;
+  // height = document.documentElement.clientHeight;
+  // width = document.documentElement.clientWidth;
+  // if(lastheight!= height || lastwidth != width){//not optimal
+  //   grd = utils.createBGgradient(context,width);
+  //   context.canvas.height = height;
+  //   context.canvas.width = width;
+  // }
+  // lastheight = height;
+  // lastwidth = width;
 
   time = Date.now();
   if(gamePaused||time-lasttime<framerate){//this resets the loop if the game is paused or if the loop is run at more than 70fps
@@ -370,8 +381,8 @@ function loop(){
     for(let i = 0; i<4; i++)
       if(Math.abs(axes[i]) < cutoff)
         axes[i] = 0;//adds a deadzone to the controller
-    player.vel[0] += axes[0];
-    player.vel[1] += axes[1];
+    player.vel.dx += axes[0];
+    player.vel.dy += axes[1];
     player.aim[0] = axes[2];
     player.aim[1] = axes[3];
 
@@ -380,19 +391,22 @@ function loop(){
   }else{//mouse and keyboard
     //move
     if(keysdown != [0,0,0,0]){
-      player.vel.x += keysdown[2] - keysdown[0];
-      player.vel.y += keysdown[3] - keysdown[1];
+      player.vel.dx += keysdown[2] - keysdown[0];
+      player.vel.dy += keysdown[3] - keysdown[1];
     }
     //aim
     let mousePos = new position(mouseX,mouseY);
     utils.aimAtCoords(player,mousePos);
     if(mousedown){
-      player.shootGun(player.aim.map(x => x*15));
+      let scaledAim = new Vector(player.aim.dx,player.aim.dy);//can make new vector by scaledaim = {...player.aim}
+      scaledAim.scale(15);
+      player.shootGun(scaledAim);
     }
   }
 
-  context.fillStyle = grd;//"linear-gradient(to bottom right, #afe569 0%, #207cca 78%, #3b5b83 100%)";
-  context.fillRect(0,0,width,height);
+  //context.fillStyle = grd;//"linear-gradient(to bottom right, #afe569 0%, #207cca 78%, #3b5b83 100%)";
+  //context.fillRect(0,0,width,height);
+  context.clearRect(0, 0, width, height);
   lasttime = time;
   entArray.Draw();
   projArray.Draw();
@@ -401,7 +415,7 @@ function loop(){
 
   utils.screenWrap(player,width,height);
   if(entArray.array.length < 15){
-    let enemy = entArray.add(new Entity).setType(0).setProperties([70]).setMass(30).setHP(100).setShape(shapes.Circle).setPosition([Math.random()*width,Math.random()*height]);
+    let enemy = entArray.add(new Entity).setType(0).setProperties([70]).setMass(30).setHP(100).setShape(shapes.Circle).setPosition(new position(Math.random()*width,Math.random()*height));
     while(d2.toRadius(d2.distance(player.pos, enemy.pos))<300){
       enemy.setPosition([Math.random()*width,Math.random()*height]);
     };
@@ -415,7 +429,8 @@ function loop(){
 
 //start of runtime code
 
-let context = document.getElementById("gb").getContext("2d", { alpha: false });
+let context = document.getElementById("gb").getContext("2d");
+let bgcontext = document.getElementById("background-layer").getContext("2d", { alpha: false });
 //context types are "2d", "webgl", "webgl2", and "bitmaprenderer" 
 //"2d" makes context an instance of "CanvasRenderingContext2D" which is a part of the canvas API
 
@@ -426,10 +441,13 @@ let lastwidth = width;
 //I'm using lastheight and lastwidth to check if the window is resized but there is a window.onresize event that should be used
 context.canvas.height = height;
 context.canvas.width = width;
-
-let grd = utils.createBGgradient(context,width);//background gradient
+bgcontext.canvas.height = height;
+bgcontext.canvas.width = width;
+let grd = utils.createBGgradient(bgcontext,width);//background gradient
 let canvasRect = document.getElementById("gb").getBoundingClientRect();
 //the canvas should fill the page now so I don't think this is needed any longer
+bgcontext.fillStyle = grd;//"linear-gradient(to bottom right, #afe569 0%, #207cca 78%, #3b5b83 100%)";
+bgcontext.fillRect(0,0,width,height);
 
 let mouseX = 0;
 let mouseY = 0;
@@ -445,7 +463,7 @@ let axes = [];
 let buttons = {};
 let projArray = new projectileArray;
 let entArray = new entityArray;
-let player = entArray.add(new Entity).setPosition([width/2,height/2]).setShape(shapes.Circle).setType(9999).setMass(1000).setFriction(.05).setProperties([40]).setAim([0,0]).setHP(60);
+let player = entArray.add(new Entity).setPosition(new position(width/2,height/2)).setShape(shapes.Circle).setType(9999).setMass(1000).setFriction(.05).setProperties([40]).setAim([0,0]).setHP(60);
 let heartImg = document.getElementById("heart");
 let emptyheartImg = document.getElementById("emptyheart");
 let playergun = new gun;
