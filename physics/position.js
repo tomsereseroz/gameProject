@@ -3,10 +3,15 @@ export default class Position {
       this.x = x;
       this.y = y;
   }
-
-  addVector(other) {
-      this.x += other.dx;
-      this.y += other.dy;
+  add(other){
+      this.x += other.x;
+      this.y += other.y;
+      return this;
   }
 
+  scale(factor){
+    this.x *= factor;
+    this.y *= factor;
+    return this;
+  }
 }

@@ -1,29 +1,26 @@
-export default class Vector {
-  constructor(dx, dy) {
-      this.dx = dx;
-      this.dy = dy;
+import position from './position.js'
+
+export default class Vector extends position{
+  constructor(x, y) {
+      super(x,y);
   }
 
-  static fromPositions(pos1, pos2) {
-      let dx = pos2.x - pos1.x;
-      let dy = pos2.y - pos1.y;
-
-      return new Vector(dx, dy);
+  static differenceVector(obj1, obj2) {
+      let x = obj2.x - obj1.x;
+      let y = obj2.y - obj1.y;
+      return new Vector(x, y);
   }
 
-  get magnitude() {//math.hypot
-      return Math.sqrt(this.dx * this.dx + this.dy * this.dy);
+  get magnitude() {
+      return Math.hypot(this.x,this.y);
   }
 
   get unitVector() {
       let m = this.magnitude;
-      return new Vector(this.dx / m, this.dy / m);
+      return new Vector(this.x / m, this.y / m);
   }
 
-  scale(factor) {
-      this.dx *= factor;
-      this.dy *= factor;
-      return this;
+  copy(){//returns new instance of vector with the same properties
+      return new Vector(this.x, this.y);
   }
-
 }
