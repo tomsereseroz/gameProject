@@ -1,9 +1,9 @@
-import d2 from './2DUtils.js';
+import Vector from './physics/vector.js';
 
 export default {
 
 createPlayerGradient(player,context,time){
-  let playergrd = context.createRadialGradient(player.pos[0], player.pos[1], 5, player.pos[0], player.pos[1],40);
+  let playergrd = context.createRadialGradient(player.position.x, player.position.y, 5, player.position.x, player.position.y,40);
   playergrd.addColorStop(0, "purple");
   playergrd.addColorStop(.4+.3*Math.sin(2*time*Math.PI/2000), "black");
   playergrd.addColorStop(.8+.1*Math.sin(2*time*Math.PI/3000), "red");
@@ -12,7 +12,7 @@ createPlayerGradient(player,context,time){
 },
 
 getHPStyle(entity,context){
-  let grd = context.createRadialGradient(entity.pos[0], entity.pos[1], 2,entity.pos[0],entity.pos[1],entity.props[0]);
+  let grd = context.createRadialGradient(entity.position.x, entity.position.y, 2,entity.position.x,entity.position.y,entity.shape.radius);
   grd.addColorStop(0, "white");
   grd.addColorStop(entity.health/101, "red");
   grd.addColorStop(1, "black");
@@ -27,46 +27,60 @@ createBGgradient(context,width){
   return grd;
 },
 
-aimAtCoords(entity,pos){
-  let dist = d2.distance(entity.pos,pos);
-  let factor = d2.toRadius(dist);
+aimAtCoords(entity,position){
+  let dist = Vector.differenceVector(entity.position,position);
+  let factor = dist.magnitude;
   factor = Math.min(factor/500, 1);
-  dist = d2.makeUnitVector(dist);
-  entity.aim = dist.map(x => x*factor);
+  dist = dist.unitVector;
+  entity.aim = dist.scale(factor);
 },
 
 aMoveAtB(a,b){
-  let look = d2.makeUnitVector(d2.distance(a.pos,b.pos));
-  a.vel[0] += look[0];
-  a.vel[1] += look[1];
+  let look = Vector.differenceVector(a.position,b.position).unitVector;
+  a.velocity.x += look.x;
+  a.velocity.y += look.y;
 },
 
 moveApart(first, second){
-  let dist = d2.distance(first.pos,second.pos);
-  let distrad = d2.toRadius(dist);
-  let diff = (first.props[0] + second.props[0]) - distrad;
+  let dist = Vector.differenceVector(first.position,second.position);
+  let distrad = dist.magnitude;
+  let diff = (first.shape.radius + second.shape.radius) - distrad;
   if(diff > 0){
     let factor = diff/distrad;
-    dist = dist.map(x => x*factor);
-    second.pos[0] += dist[0];
-    second.pos[1] += dist[1];
+    dist.scale(factor);
+    second.position.x += dist.x;
+    second.position.y += dist.y;
   }
 },
 
-drawAimIndicator(entity,context){
+drawAimIndicator(entity,context,strokeStyle='pink'){
   context.beginPath();
-  context.strokeStyle = "pink";
-  context.moveTo(entity.pos[0],entity.pos[1]);
+  context.strokeStyle = strokeStyle;
+  context.moveTo(entity.position.x,entity.position.y);
   context.lineWidth = 10;
-  context.lineTo(entity.pos[0]+entity.aim[0]*40,entity.pos[1]+entity.aim[1]*40);
+  context.lineTo(entity.position.x+entity.aim.x*40,entity.position.y+entity.aim.y*40);
   context.stroke();
 },
 
 screenWrap(object,width,height){
-  if( object.pos[0] < 0 ){object.pos[0] += width;}
-  if( object.pos[1] < 0 ){object.pos[1] += height;}
-  if( object.pos[0] > width ){object.pos[0] -= width;}
-  if( object.pos[1] > height ){object.pos[1] -= height;}
+  if( object.position.x < 0 ){object.position.x += width;}
+  if( object.position.y < 0 ){object.position.y += height;}
+  if( object.position.x > width ){object.position.x -= width;}
+  if( object.position.y > height ){object.position.y -= height;}
+},
+
+drawButton(button, index){//this is to see where a button maps with a certain gamepad/. use buttons.forEach(drawButton)
+  context.fillStyle = "black";
+  if(button.value){context.fillStyle = "white";}
+  var xval = Math.floor(index/5)*100+20;
+  var yval = (index*100+20)%height;
+  context.fillRect(xval,yval,60,60);
+  a
+},
+
+setStyleBasedOnType(entity,type,time,context){
+  if(type == 9999)return this.createPlayerGradient(entity,context,time);
+  return this.getHPStyle(entity,context);
 },
 
 }
