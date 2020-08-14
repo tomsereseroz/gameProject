@@ -1,22 +1,25 @@
-import mouseInterface from './interface/mouseInterface.js';
-import keyboardInterface from './interface/keyboardInterface.js';
-import utils from './gameUtils.js';
+import mouseInterface from './mouseInterface.js';
+import keyboardInterface from './keyboardInterface.js';
+import physicsUtils from '../physics/physicsUtils.js';
 
 export default class inputHandler{
   constructor(player,canvasID){
-    this.player = player;
+    this.player = player;//I dont really like how player has to be a member here
     this.gamePaused = false;
     this.kI = new keyboardInterface();
     this.mI = new mouseInterface(canvasID);
     this.kI.addWatcher('KeyW').addWatcher('KeyA').addWatcher('KeyS').addWatcher('KeyD');
     this.kI.addWatcher('ArrowUp').addWatcher('ArrowDown').addWatcher('ArrowLeft').addWatcher('ArrowRight');
-    this.kI.addCallback('Escape',[togglePause,this]);
+    this.kI.addCallback('Escape',[togglePause,this]);//todo: make this available only once game has started
     document.getElementById("pauseMenu").children[0].addEventListener("click", () => {this.gamePaused = false;} );
-    document.getElementById("pauseMenu").children[1].addEventListener("click", () => {location.reload();} );
+    document.getElementById("pauseMenu").children[1].addEventListener("click", () => {
+      if(confirm("Are you sure you want to return to the main menu? your progress will be lost."))
+        location.reload();
+    } );
 
   }
   handleKeyboardAndMouseInput(){//maybe have this method take player as an input instead of the constructor
-    utils.aimAtCoords(this.player,this.mI.mousePosition);
+    physicsUtils.aimAtCoords(this.player,this.mI.mousePosition);
     if(this.kI.codeMap['KeyW']||this.kI.codeMap['ArrowUp'])//returns true if key is pressed
       this.player.velocity.y -= this.player.acceleration;
     if(this.kI.codeMap['KeyS']||this.kI.codeMap['ArrowDown'])//might need to add codeMap['S'],['A'] etc.

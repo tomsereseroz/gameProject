@@ -2,7 +2,7 @@ export default class keyboardInterface{
   constructor(){
     this.codeMap = [];//map at 'code' = true if key with matching code is pressed down
     this.callbackMap = {};//kinda fucked up implementation but callbackmap is an object with named arrays.
-    //current usage is callbackmap."code" = [callbackFunction, firstArgument]
+    //current usage is callbackmap["code"] = [callbackFunction, firstArgument]
     window.onkeydown = (event)=>{
       if(this.codeMap[event.code] != undefined)
         this.codeMap[event.code] = true;
@@ -14,7 +14,7 @@ export default class keyboardInterface{
         this.codeMap[event.code] = false;
     };
   }
-  addCallback(code,callbackObject){//adds a keypress event that calls a given function
+  addCallback(code,callbackObject){
     this.callbackMap[code] = callbackObject;
     return this;
   }
@@ -22,7 +22,7 @@ export default class keyboardInterface{
     this.codeMap[code] = false;
     return this;
   }
-  removeCallback(code){//adds a keypress event that calls a given function
+  removeCallback(code){
     delete this.callbackMap[code];
     return this;
   }

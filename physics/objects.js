@@ -1,8 +1,8 @@
-import Position from '../physics/position.js';
-import Vector from '../physics/position.js';
-import utils from '../gameUtils.js';
-import { circle } from '../physics/shapes.js';
-
+import Position from './position.js';
+import Vector from './position.js';
+import drawingUtils from '../game/drawingUtils.js';
+import { circle } from './shapes.js';
+//todo: add enemy specific class - extension of entity
 export class Object{
   constructor(position=new Position(10,10),shape={},style='black'){
     this.position = position;//position [x,y]
@@ -43,6 +43,21 @@ export class physObj extends Object{
   Draw(context){
     if(this.shape.isOnScreen(context)) super.Draw(context);
   }
+  absorbMomentum(other){
+    let totalMass = this.mass+other.mass;
+    this.velocity.x = this.mass*this.velocity.x/totalMass + other.velocity.x*other.mass/totalMass;
+    this.velocity.y = this.mass*this.velocity.y/totalMass + other.velocity.y*other.mass/totalMass;
+    return this;
+  }
+  tradeMomentum(other){
+    let momentum1 = this.velocity.copy().scale(this.mass);
+    let momentum2 = other.velocity.copy().scale(other.mass);
+    let finalVelocity1 = momentum2.scale(1/this.mass);
+    let finalVelocity2 = momentum1.scale(1/other.mass);
+    this.velocity = finalVelocity1;
+    other.velocity = finalVelocity2;
+    return this;
+  }
 }
 
 export class Projectile extends physObj{//projectiles handle collision with entities
@@ -59,31 +74,26 @@ export class Projectile extends physObj{//projectiles handle collision with enti
 export class Entity extends physObj{//entities are for things that aim in a certaian direction and have health
   constructor(){
     super();
-    this.aim = new Vector(0,0);//aim [ax, ay]
+    this.aim = new Vector(0,0);//aim.x, .y
     this.health = 10;
-    this.gun = 0;//delay in ms between shots
-    this.moveFunction
+    this.gun = 0;
+    this.moveFunction;
+    this.hurtSound;
   }
   setAim(aim){this.aim.x = aim.x; this.aim.y = aim.y; return this;}
   setHP(health){this.health = health; return this;}
   setGun(gun){this.gun = gun; return this;}
   shootGun(){this.gun.Shoot({...this.position},this.aim.copy().scale(15)); return this;}
-  conserveMomentum(source){
-    let mtot = this.mass+source.mass;
-    this.velocity.x = this.mass*this.velocity.x/mtot + source.velocity.x*source.mass/mtot;
-    this.velocity.y = this.mass*this.velocity.y/mtot + source.velocity.y*source.mass/mtot;
-    return this;
-  }
   Tick(time,context){
     if(this.gun)
       this.gun.Tick();
     super.Tick();
-    this.shape.style = utils.setStyleBasedOnType(this,this.type,time,context);
+    this.shape.style = drawingUtils.setStyleBasedOnType(this,this.type,time,context);
   }
   Draw(context){
     super.Draw(context);
     if(this.type==9999)
-      utils.drawAimIndicator(this,context)
+      drawingUtils.drawAimIndicator(this,context)
   }
   damage(source){this.health-=source.damage; return this;}
   checkHP(){return this.health < 1;}
@@ -98,7 +108,7 @@ export class gun{
     this.damage = 10;
     //this.shotSpeed = 10;
     this.shotSize = 10;
-    this.shotMass = 5;
+    this.shotMass = 10;
     this.shotFriction = 0;
     this.timeout = 180;
     this.shotSound = new Audio("../assets/snap.mp3");
@@ -112,7 +122,6 @@ export class gun{
         this.shotSound.play();
       this.ticksToNextShot = this.delay;
       this.projArray.add(new Projectile).setType(this.type).setDamage(this.damage).setFriction(this.shotFriction).setMass(this.shotMass).setPosition(pos).setVelocity(velocity).setTimeout(this.timeout).setShape(new circle(this.shotSize,pos));
-      //this.projArray.Display();
     }
   }
   Tick(){
