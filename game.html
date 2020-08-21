@@ -6,8 +6,6 @@
 </head>
 <script type='module' src="game.js"></script>
 <body>
-	<img id="heart" src="./assets/40x36heart.png"/>
-	<img id="emptyheart" src="./assets/40x36emptyheart.png"/>
 	<div id="stage">
 		<canvas id="gb"></canvas>
 		<canvas id="ui-layer" width="480" height="320"></canvas>
@@ -22,6 +20,8 @@
 		<button type="button" onclick="this.parentElement.style = 'display:none;';" >Resume</button>
 		<button type="button" onclick="this.parentElement.style = 'display:none;';">Main Menu</button>
 	</div>
+	<div id="healthbar"><div id="health"></div></div>
+	<object id="svg-object" data="./assets/ambiance.svg" type="image/svg+xml"></object>
 </body>
 
 <style>
@@ -29,10 +29,18 @@
 
 		img {display: none;}
 
+		#svg-object{
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			opacity: 0.3;
+			z-index: 1;
+		}
+
 		#stage {
 			width: 100%;
 			height: 100%;
-			position: relative;
+			position: absolute;
 			border: none;
   	}
 
@@ -47,7 +55,25 @@
 			left: 50%;
    		transform: translate(-50%, -50%);
 		}
-		
+		#healthbar {
+			position:absolute;
+			width: 500px;
+			height: 51px;
+			top: 35px;
+			left:50%;
+			transform: translate(-50%,-50%);
+			z-index: 4;
+			background-color: black;
+			border-radius: 15px;
+		}
+		#health{
+			height: 40px;
+			width: 50%;
+			border-radius: 10px;
+			transform: translate(5px,5px);
+			background-color: red;
+			z-index: 4;
+		}
 		button {
 			font-weight: bold;
 			font-size: 4em;
@@ -58,7 +84,6 @@
 			background-color:rgb(80,80,90);
 			user-select: none;
 		}
-
 		#pauseMenu {
 			font-size: 0.5em;
 			display: none;

@@ -19,13 +19,14 @@ export class Object{
 }
 
 export class physObj extends Object{
-  constructor(position,shape,style,velocity=new Vector(0,0),type=0,mass=1,friction=.1,acceleration=1){
+  constructor(position,shape,style,velocity=new Vector(0,0),type=0,mass=1,friction=.1,acceleration=1,damage=1){
     super(position,shape,style);
-    this.velocity = velocity;//velocity [vx, vy]
+    this.velocity = velocity;//velocity.x , .y
     this.type = type;//type for collisions(collisions are ignored for similar types)
     this.mass = mass;//mass
     this.friction = friction;//friction constant should be 0 to 1.
     this.acceleration = acceleration;
+    this.damage = damage;
   }
   setVelocity(velocity){this.velocity.x = velocity.x; this.velocity.y = velocity.y; return this;}
   setType(type){this.type = type; return this;}
@@ -43,7 +44,7 @@ export class physObj extends Object{
   Draw(context){
     if(this.shape.isOnScreen(context)) super.Draw(context);
   }
-  absorbMomentum(other){
+  absorbMomentum(other){//maybe wanna move these momentum functions into physics utils
     let totalMass = this.mass+other.mass;
     this.velocity.x = this.mass*this.velocity.x/totalMass + other.velocity.x*other.mass/totalMass;
     this.velocity.y = this.mass*this.velocity.y/totalMass + other.velocity.y*other.mass/totalMass;
@@ -63,7 +64,6 @@ export class physObj extends Object{
 export class Projectile extends physObj{//projectiles handle collision with entities
   constructor(){
     super();
-    this.damage = 1;
     this.timeout = 60;//number of ticks until deletion
   }
   setDamage(damage){this.damage = damage; return this;}
@@ -78,7 +78,8 @@ export class Entity extends physObj{//entities are for things that aim in a cert
     this.health = 10;
     this.gun = 0;
     this.moveFunction;
-    this.hurtSound;
+    this.hurtSound = new Audio("../assets/hit.mp3");
+    this.hurtSound.volume = 0.5;
   }
   setAim(aim){this.aim.x = aim.x; this.aim.y = aim.y; return this;}
   setHP(health){this.health = health; return this;}
@@ -95,7 +96,7 @@ export class Entity extends physObj{//entities are for things that aim in a cert
     if(this.type==9999)
       drawingUtils.drawAimIndicator(this,context)
   }
-  damage(source){this.health-=source.damage; return this;}
+  applyDamage(source){this.health-=source.damage; return this;}
   checkHP(){return this.health < 1;}
 }
 
@@ -103,12 +104,12 @@ export class gun{
   constructor(projArray=[]){
     this.projArray = projArray;
     this.type = 0;
-    this.delay = 10;
+    this.delay = 20;
     this.ticksToNextShot = 0;
-    this.damage = 10;
+    this.damage = 25;
     //this.shotSpeed = 10;
     this.shotSize = 10;
-    this.shotMass = 10;
+    this.shotMass = 2;
     this.shotFriction = 0;
     this.timeout = 180;
     this.shotSound = new Audio("../assets/snap.mp3");

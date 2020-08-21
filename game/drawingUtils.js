@@ -16,14 +16,13 @@ export default{
     return grd;
   },
   
-  createBGgradient(context,width){
-    let grd = context.createLinearGradient(0, 0, width, 0);
-    grd.addColorStop(0, "#afe569");
-    grd.addColorStop(.8, "#207cca");
-    grd.addColorStop(1, "#3b5b83");
-    return grd;
+  drawHPBar(player){
+    let healthbox = document.getElementById("health");
+    if(player.health < 1)
+      healthbox.style = "display: none"
+    healthbox.style.width = player.health.toString(10)+"px";  
   },
-  
+
   drawAimIndicator(entity,context,strokeStyle='pink'){
     context.beginPath();
     context.strokeStyle = strokeStyle;
@@ -39,7 +38,6 @@ export default{
     var xval = Math.floor(index/5)*100+20;
     var yval = (index*100+20)%height;
     context.fillRect(xval,yval,60,60);
-    a
   },
   
   setStyleBasedOnType(entity,type,time,context){

@@ -1,4 +1,5 @@
 import physicsUtils from '../physics/physicsUtils.js';
+import drawingUtils from '../game/drawingUtils.js';
 import Vector from '../physics/vector.js';
 
 export class objectArray{
@@ -33,7 +34,7 @@ export class objectArray{
   }
 }
 
-export class projectileArray extends objectArray{
+export class projectileArray extends objectArray{//checks all projectiles with entities
   Tick(entArray){
     var deleted = false;
     for (var i = 0; i < this.array.length; i++){
@@ -42,8 +43,9 @@ export class projectileArray extends objectArray{
         deleted = true;
       }else{
         for(var j = 0; j < entArray.array.length; j++){
-          if(this.array[i].collidesWith(entArray.array[j])&&this.array[i].type!=entArray.array[j].type){
-            entArray.array[j].damage(this.array[i]).absorbMomentum(this.array[i]);
+          if(this.array[i].type!=entArray.array[j].type&&this.array[i].collidesWith(entArray.array[j])){
+            entArray.array[j].applyDamage(this.array[i]).absorbMomentum(this.array[i]);
+            entArray.array[j].hurtSound.play();
             if(entArray.array[j].checkHP()){
               this.deathSound.play();
               entArray.array.splice(j,1);
@@ -68,11 +70,8 @@ export class entityArray extends objectArray{
       for(var j = i+1; j < this.array.length; j++){
         if(this.array[i].collidesWith(this.array[j])){
           physicsUtils.moveApart(this.array[i],this.array[j]);
-          if(this.array[i].type != this.array[j].type){
-            this.array[i].tradeMomentum(this.array[j]);
-            if(i==0)
-              this.array[i].hurtSound.play();
-          }
+          if(this.array[i].type != this.array[j].type)
+            handleEntityCollision(this.array[i],this.array[j]);
         }
       }
       if(this.array[i].type == 0){
@@ -80,8 +79,21 @@ export class entityArray extends objectArray{
           physicsUtils.aMoveAtB(this.array[i],this.array[0])//move at player (index 0) for each normal enemy
       }
       this.array[i].Tick(time,this.context);
-      
-      
     }
   }
+}
+
+function handleEntityCollision(object1,object2){
+  object1.tradeMomentum(object2);
+  if(object1.damage)
+    damageObject(object1,object2);
+  if(object2.damage)
+    damageObject(object2,object1);
+}
+
+function damageObject(damager,object){
+    object.applyDamage(damager);
+    object.hurtSound.play();
+    if(object.type==9999)
+      drawingUtils.drawHPBar(object);
 }

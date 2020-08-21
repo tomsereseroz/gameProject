@@ -1,109 +1,81 @@
 import physicsUtils from './physics/physicsUtils.js';
 import drawUtils from './game/drawingUtils.js';
 import Vector from './physics/vector.js';
-import {circle, rectangle} from './physics/shapes.js';
+import {circle} from './physics/shapes.js';
 import position from './physics/position.js';
 import inputHandler from './interface/inputHandler.js';
-import {Object, physObj, Projectile, Entity, gun} from './physics/objects.js';
+import {Entity, gun} from './physics/objects.js';
 import {projectileArray, entityArray} from './game/objectArrays.js';
 import Position from './physics/position.js';
+import eventListeners from './interface/listeners.js';
+import gameOver from './game/gameOver.js';
 
 console.log('game.js');
 
-let numpads = 0;
+let context = document.getElementById("gb").getContext("2d");
+let uicontext = document.getElementById("ui-layer").getContext("2d");
+let bgcontext = document.getElementById("background-layer").getContext("2d", { alpha: false });
+let contextArray = [bgcontext,context,uicontext];//ordered from background to foreground
+let numpads = 0;//number of connected gamepads
+let eventListenerHandler = new eventListeners(contextArray,numpads);
 
-window.addEventListener("gamepadconnected", function() { console.log("connected"); numpads++ });
-window.addEventListener("gamepaddisconnected", function() { numpads-- });
-window.addEventListener("resize",() =>{
-  height = document.documentElement.clientHeight;
-  width = document.documentElement.clientWidth;
-  grd = drawUtils.createBGgradient(bgcontext,width);
-  bgcontext.canvas.height = height;
-  bgcontext.canvas.width = width;
-  context.canvas.height = height;
-  context.canvas.width = width;
-  bgcontext.fillStyle = grd;//"linear-gradient(to right, #afe569 0%, #207cca 78%, #3b5b83 100%)";
-  bgcontext.fillRect(0,0,width,height);
-});
-document.getElementById("pauseMenu").children[0].addEventListener("click", () => {iH.gamePaused = 0;} );
-document.getElementById("pauseMenu").children[1].addEventListener("click", () => {location.reload();} );
-window.addEventListener("contextmenu",(e)=>{e.preventDefault();},false);//this cancels the normal right-click menu
+let clientBox = eventListenerHandler.clientBox;
+
+let time = Date.now();
+let lasttime = time;
+let framerate = 70;
+let msDelay = 1000/framerate;
+let projArray = new projectileArray(context);
+let entArray = new entityArray(context);
+let playerpos = new position(clientBox.width/2,clientBox.height/2);
+let player = entArray.add(new Entity).setPosition(playerpos).setShape(new circle(40,playerpos)).setType(9999).setMass(10).setFriction(.05).setAim([0,0]).setHP(490);
+player.hurtSound = new Audio("./assets/Oof.mp3");
+let playergun = new gun(projArray);
+playergun.setType(9999);// I set the player type to 9999. default is 0
+player.setGun(playergun);
+drawUtils.drawHPBar(player);
+
+let iH = new inputHandler(player,"gb");
+
+loop();
 
 function loop(){
   time = Date.now();
-  if(iH.gamePaused||time-lasttime<framerate){//this resets the loop if the game is paused or if the loop is run at more than 70fps
+  if(iH.gamePaused||time-lasttime<msDelay){//this locks the game to run at [framerate] so it doesn't run too fast on 144hz monitors
+    if(eventListenerHandler.numberofConnectedGamepads)
+      iH.checkPauseButton();
     window.requestAnimationFrame(loop);
     return;
   }
-  
-  //control section
-  if(numpads){//gamepad 
+  lasttime = time;
+
+  if(eventListenerHandler.numberofConnectedGamepads){
     iH.handleGamepadInput();
   }else{//mouse and keyboard
     iH.handleKeyboardAndMouseInput();
   }
 
-  context.clearRect(0, 0, width, height);
-  lasttime = time;
-
   projArray.Tick(entArray);
   entArray.Tick(time);
+  if(player.health<=0){
+    gameOver(contextArray);
+    return;
+  }
+  context.clearRect(0, 0, clientBox.width, clientBox.height);
   entArray.Draw(context);
   projArray.Draw(context);
-  
-  physicsUtils.screenWrap(player,width,height);
+  physicsUtils.screenWrap(player,clientBox.width,clientBox.height);
   if(entArray.array.length < 5){
-    let enemy = entArray.add(new Entity).setType(0).setMass(30).setHP(100).setShape(new circle(70)).setPosition(new position(Math.random()*width,Math.random()*height));
+    let enemy = entArray.add(new Entity).setType(0).setMass(30).setHP(100).setShape(new circle(30)).setPosition(new position(Math.random()*clientBox.width,Math.random()*clientBox.height));
     enemy.shape.position = enemy.position;
+    enemy.damage = 50;
     while(Vector.differenceVector(player.position, enemy.position).magnitude<300){
-      enemy.setPosition(new Position(Math.random()*width,Math.random()*height));
+      enemy.setPosition(new Position(Math.random()*clientBox.width,Math.random()*clientBox.height));
       enemy.shape.position = enemy.position;
       enemy.deathSound = new Audio("./assets/bleh.mp3");
     };
   }
-  context.drawImage(heartImg, 10, 10);
-  context.drawImage(heartImg, 55, 10);
-  context.drawImage(emptyheartImg, 100, 10);
+
   window.requestAnimationFrame(loop);
   
 }
-
-//start of runtime code
-
-let context = document.getElementById("gb").getContext("2d");
-let bgcontext = document.getElementById("background-layer").getContext("2d", { alpha: false });
-//context types are "2d", "webgl", "webgl2", and "bitmaprenderer" 
-//"2d" makes context an instance of "CanvasRenderingContext2D" which is a part of the canvas API
-
-let height = document.documentElement.clientHeight;
-let width = document.documentElement.clientWidth;
-//I'm using lastheight and lastwidth to check if the window is resized but there is a window.onresize event that should be used
-context.canvas.height = height;
-context.canvas.width = width;
-bgcontext.canvas.height = height;
-bgcontext.canvas.width = width;
-let grd = drawUtils.createBGgradient(bgcontext,width);//background gradient
-//the canvas should fill the page now so I don't think this is needed any longer
-bgcontext.fillStyle = grd;//"linear-gradient(to bottom right, #afe569 0%, #207cca 78%, #3b5b83 100%)";
-bgcontext.fillRect(0,0,width,height);
-
-
-let time = Date.now();
-let lasttime = time;
-let framerate = 1000/70;
-let projArray = new projectileArray(context);
-let entArray = new entityArray(context);
-let playerpos = new position(width/2,height/2);
-let player = entArray.add(new Entity).setPosition(playerpos).setShape(new circle(40,playerpos)).setType(9999).setMass(10).setFriction(.05).setAim([0,0]).setHP(60);
-player.hurtSound = new Audio("./assets/Oof.mp3");
-let heartImg = document.getElementById("heart");
-let emptyheartImg = document.getElementById("emptyheart");
-let playergun = new gun(projArray);
-playergun.setType(9999);// I set the player type to 9999. default is 0
-//projectiles marked 9999 are assumed to originate from the player and only hurt enemies
-player.setGun(playergun);
-
-
-let iH = new inputHandler(player,"gb");
-
-loop();
