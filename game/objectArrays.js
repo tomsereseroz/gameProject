@@ -1,6 +1,7 @@
 import physicsUtils from '../physics/physicsUtils.js';
 import drawingUtils from '../game/drawingUtils.js';
 import Vector from '../physics/vector.js';
+import {basicShooter, basicMelee} from '../game/enemies.js';
 
 export class objectArray{
   constructor(context){
@@ -45,9 +46,9 @@ export class projectileArray extends objectArray{//checks all projectiles with e
         for(var j = 0; j < entArray.array.length; j++){
           if(this.array[i].type!=entArray.array[j].type&&this.array[i].collidesWith(entArray.array[j])){
             entArray.array[j].applyDamage(this.array[i]).absorbMomentum(this.array[i]);
-            entArray.array[j].hurtSound.play();
-            if(entArray.array[j].checkHP()){
-              this.deathSound.play();
+            if(entArray.array[j].type == 9999) drawingUtils.drawHPBar(entArray.array[j]);
+            if(entArray.array[j].checkHP()&&entArray.array[j].type!=9999){
+              entArray.array[j].deathSound.play();
               entArray.array.splice(j,1);
               j--
             }
@@ -74,11 +75,8 @@ export class entityArray extends objectArray{
             handleEntityCollision(this.array[i],this.array[j]);
         }
       }
-      if(this.array[i].type == 0){
-        if(Vector.differenceVector(this.array[i].position,this.array[0].position).magnitude<500)
-          physicsUtils.aMoveAtB(this.array[i],this.array[0])//move at player (index 0) for each normal enemy
-      }
-      this.array[i].Tick(time,this.context);
+      if(this.array[i] instanceof basicShooter|| this.array[i] instanceof basicMelee) this.array[i].Tick(this.array[0],this.context);
+      else this.array[i].Tick(time,this.context);
     }
   }
 }
@@ -93,7 +91,6 @@ function handleEntityCollision(object1,object2){
 
 function damageObject(damager,object){
     object.applyDamage(damager);
-    object.hurtSound.play();
     if(object.type==9999)
       drawingUtils.drawHPBar(object);
 }

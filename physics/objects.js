@@ -2,15 +2,16 @@ import Position from './position.js';
 import Vector from './position.js';
 import drawingUtils from '../game/drawingUtils.js';
 import { circle } from './shapes.js';
-//todo: add enemy specific class - extension of entity
+import {gun} from '../game/guns.js';
+
 export class Object{
   constructor(position=new Position(10,10),shape={},style='black'){
     this.position = position;//position [x,y]
     this.shape = shape;//shape
     this.shape.position = this.position;
-    this.style = style;//fillStyle
+    this.shape.style = style;//fillStyle
   }
-  setStyle(style){this.style = style; return this;}
+  setStyle(style){this.shape.style = style; return this;}
   setShape(shape){this.shape = shape; return this;}
   setPosition(position){this.position = position; return this;}
   Draw(context){
@@ -19,7 +20,7 @@ export class Object{
 }
 
 export class physObj extends Object{
-  constructor(position,shape,style,velocity=new Vector(0,0),type=0,mass=1,friction=.1,acceleration=1,damage=1){
+  constructor(position,shape,style,velocity=new Vector(0,0),type=0,mass=1,friction=.1,acceleration=1,damage=0){
     super(position,shape,style);
     this.velocity = velocity;//velocity.x , .y
     this.type = type;//type for collisions(collisions are ignored for similar types)
@@ -68,7 +69,7 @@ export class Projectile extends physObj{//projectiles handle collision with enti
   }
   setDamage(damage){this.damage = damage; return this;}
   setTimeout(timeout){this.timeout = timeout; return this;}
-  checkTimeout(){return !this.timeout--;} 
+  checkTimeout(){return !this.timeout--;}
 }
 
 export class Entity extends physObj{//entities are for things that aim in a certaian direction and have health
@@ -91,43 +92,46 @@ export class Entity extends physObj{//entities are for things that aim in a cert
     super.Tick();
     this.shape.style = drawingUtils.setStyleBasedOnType(this,this.type,time,context);
   }
+  Tick2(){
+    if(this.gun)
+      this.gun.Tick();
+    super.Tick();
+  }
   Draw(context){
     super.Draw(context);
-    if(this.type==9999)
-      drawingUtils.drawAimIndicator(this,context)
   }
-  applyDamage(source){this.health-=source.damage; return this;}
+  applyDamage(source){this.health-=source.damage; this.hurtSound.play(); return this;}
   checkHP(){return this.health < 1;}
 }
 
-export class gun{
-  constructor(projArray=[]){
-    this.projArray = projArray;
-    this.type = 0;
-    this.delay = 20;
-    this.ticksToNextShot = 0;
-    this.damage = 25;
-    //this.shotSpeed = 10;
-    this.shotSize = 10;
-    this.shotMass = 2;
-    this.shotFriction = 0;
-    this.timeout = 180;
-    this.shotSound = new Audio("../assets/snap.mp3");
-    this.shotSound.volume = 0.05;
+export class Player extends Entity{
+  constructor(projArray,position){
+    super();
+    this.gun = new gun(projArray);
+    this.gun.type = 9999;
+    this.type = 9999;
+    this.mass = 10;
+    this.friction = 0.05;
+    this.health = 490;
+    this.position = position;
+    this.shape = new circle(40,this.position);
+    this.hurtSound = new Audio("./assets/Oof.mp3");
   }
-  setType(type){this.type = type; return this;}
-  canShoot(){return this.ticksToNextShot == 0;}
-  Shoot(pos, velocity){
-    if(this.canShoot()){
-      if(this.shotSound!=undefined)
-        this.shotSound.play();
-      this.ticksToNextShot = this.delay;
-      this.projArray.add(new Projectile).setType(this.type).setDamage(this.damage).setFriction(this.shotFriction).setMass(this.shotMass).setPosition(pos).setVelocity(velocity).setTimeout(this.timeout).setShape(new circle(this.shotSize,pos));
-    }
+  Tick(time,context){
+    super.Tick2();
+    let playergrd = this.generatePlayerGradient(time,context);
+    this.shape.style = playergrd;
   }
-  Tick(){
-    if(this.ticksToNextShot)
-      this.ticksToNextShot--;
+  Draw(context){
+    super.Draw(context);
+    drawingUtils.drawAimIndicator(this,context);
+  }
+  generatePlayerGradient(time,context){
+    let playergrd = context.createRadialGradient(this.position.x, this.position.y, 5, this.position.x, this.position.y,40);
+    playergrd.addColorStop(0, "purple");
+    playergrd.addColorStop(.4+.3*Math.sin(2*time*Math.PI/2000), "black");
+    playergrd.addColorStop(.8+.1*Math.sin(2*time*Math.PI/3000), "red");
+    playergrd.addColorStop(.95+.05*Math.sin(2*time*Math.PI/600), "pink");
+    return playergrd;
   }
 }
-

@@ -5,7 +5,7 @@ export default function gameOver(contextArray){
   svgObj.setAttribute("style", "opacity: 1");
   let monoArray = getMonochromeArray(contextArray);
   fadeToMonochrome(contextArray,monoArray);
-  setTimeout(displayWasted,2250);
+  setTimeout(displayGO,2250);
 }
 
 function fadeToMonochrome(contextArray,imgDataArray,iteration=0){
@@ -58,10 +58,9 @@ function jumpToMonochrome(contextArray){
   });
 }
 
-function displayWasted(){
+function displayGO(){
   var a = document.createElement("p");
-  a.className = "wasted";
-  a.style = "position:absolute; top:50%; right:50%; z-index:4; font-size: 80px; color: red; -webkit-text-stroke: 3px black; transform: translate(50%, -50%); font-family: Impact; ";
+  a.style = "position:absolute; top:50%; right:50%; z-index:4; font-size: 80px; color: red; -webkit-text-stroke: 3px black; transform: translate(50%, -50%); font-family: Impact; user-select: none;";
   var node = document.createTextNode("Game Over");
   a.appendChild(node);
   var stage = document.getElementById("stage");

@@ -17,6 +17,12 @@ aimAtCoords(entity,position){
   entity.aim = dist.scale(factor);
 },
 
+aimAtCoords2(entity,position){
+  let dist = Vector.differenceVector(entity.position,position);
+  dist = dist.unitVector;
+  entity.aim = dist;
+},
+
 aMoveAtB(a,b){
   let look = Vector.differenceVector(a.position,b.position).unitVector;
   a.velocity.x += look.x;
