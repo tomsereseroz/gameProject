@@ -21,6 +21,7 @@
 		<button type="button" onclick="this.parentElement.style = 'display:none;';">Main Menu</button>
 	</div>
 	<div id="healthbar"><div id="health"></div></div>
+	<div id="score"><pre>Score: </pre><pre id="scorenum">0</pre></div>
 	<object id="svg-object" data="./assets/ambiance.svg" type="image/svg+xml"></object>
 </body>
 
@@ -45,7 +46,7 @@
   	}
 
 		canvas { position: absolute; }
-		#mainMenu, #pauseMenu { 
+		#mainMenu, #pauseMenu, #score{ 
 			z-index: 4; 
 			position: absolute; 
 			display: flex;
@@ -65,6 +66,18 @@
 			z-index: 4;
 			background-color: black;
 			border-radius: 15px;
+		}
+		#score{
+			flex-direction: row;
+			background-color: rgba(0,0,0,0.5);
+			border-radius: 15px;
+			padding: 10px;
+			color: blanchedalmond;
+			top: 45px;
+			left: 150px;
+			font-size: 3em;
+			align-content: center;
+			user-select: none;
 		}
 		#health{
 			height: 40px;

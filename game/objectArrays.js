@@ -47,10 +47,15 @@ export class projectileArray extends objectArray{//checks all projectiles with e
           if(this.array[i].type!=entArray.array[j].type&&this.array[i].collidesWith(entArray.array[j])){
             entArray.array[j].applyDamage(this.array[i]).absorbMomentum(this.array[i]);
             if(entArray.array[j].type == 9999) drawingUtils.drawHPBar(entArray.array[j]);
-            if(entArray.array[j].checkHP()&&entArray.array[j].type!=9999){
-              entArray.array[j].deathSound.play();
-              entArray.array.splice(j,1);
-              j--
+            if(entArray.array[j].type!=9999){
+              entArray.array[j].aggroRange = 2000;
+              if(entArray.array[j].checkHP()){
+                entArray.array[j].deathSound.play();
+                addToScore(entArray.array[j].maxHealth);
+                entArray.array.splice(j,1);
+                j--
+                
+              }
             }
             deleted = true;
             break;
@@ -93,4 +98,10 @@ function damageObject(damager,object){
     object.applyDamage(damager);
     if(object.type==9999)
       drawingUtils.drawHPBar(object);
+}
+
+function addToScore(number){
+  let score = parseInt(document.getElementById("scorenum").textContent);
+  score += number;
+  document.getElementById("scorenum").textContent = String(score);
 }

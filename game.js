@@ -45,7 +45,7 @@ loop();
 function loop(){
   time = Date.now();
   
-  if(iH.gamePaused||time-lasttime<msDelay){//this locks the game to run at [framerate] so it doesn't run too fast on 144hz monitors
+  if(iH.gamePaused||time-lasttime<msDelay){//this locks the game to run at [framerate] so it doesn't run too fast on 144hz+ monitors
     if(eventListenerHandler.numberofConnectedGamepads)
       iH.checkPauseButton();
     window.requestAnimationFrame(loop);
@@ -69,16 +69,17 @@ function loop(){
   entArray.Draw(context);
   projArray.Draw(context);
   physicsUtils.screenWrap(player,clientBox.width,clientBox.height);
-  if(entArray.array.length < 10){
+  if(entArray.array.length < 5){
     let enemy;
     if(Math.random()<0.5){
-      enemy = entArray.add(new basicMelee).setPosition(new position(Math.random()*clientBox.width,Math.random()*clientBox.height));
+      enemy = entArray.add(new basicMelee);
     }else{
-      enemy = entArray.add(new basicShooter(projArray)).setPosition(new position(Math.random()*clientBox.width,Math.random()*clientBox.height));
+      enemy = entArray.add(new basicShooter(projArray));
     }
+    enemy.position = new position(Math.random()*clientBox.width,Math.random()*clientBox.height);
     enemy.shape.position = enemy.position;
     while(Vector.differenceVector(player.position, enemy.position).magnitude<300){
-      enemy.setPosition(new Position(Math.random()*clientBox.width,Math.random()*clientBox.height));
+      enemy.position = new Position(Math.random()*clientBox.width,Math.random()*clientBox.height);
       enemy.shape.position = enemy.position;
     };
   }

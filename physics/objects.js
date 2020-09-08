@@ -11,9 +11,6 @@ export class Object{
     this.shape.position = this.position;
     this.shape.style = style;//fillStyle
   }
-  setStyle(style){this.shape.style = style; return this;}
-  setShape(shape){this.shape = shape; return this;}
-  setPosition(position){this.position = position; return this;}
   Draw(context){
     this.shape.draw(context);
   }
@@ -29,10 +26,6 @@ export class physObj extends Object{
     this.acceleration = acceleration;
     this.damage = damage;
   }
-  setVelocity(velocity){this.velocity.x = velocity.x; this.velocity.y = velocity.y; return this;}
-  setType(type){this.type = type; return this;}
-  setMass(mass){this.mass = mass; return this;}
-  setFriction(friction){this.friction = friction; return this;}
   Tick(){//updates position based on velocity and applies a damping to velocity
     this.position.x = this.position.x + this.velocity.x;
     this.position.y = this.position.y + this.velocity.y;
@@ -67,8 +60,6 @@ export class Projectile extends physObj{//projectiles handle collision with enti
     super();
     this.timeout = 60;//number of ticks until deletion
   }
-  setDamage(damage){this.damage = damage; return this;}
-  setTimeout(timeout){this.timeout = timeout; return this;}
   checkTimeout(){return !this.timeout--;}
 }
 
@@ -82,17 +73,8 @@ export class Entity extends physObj{//entities are for things that aim in a cert
     this.hurtSound = new Audio("../assets/hit.mp3");
     this.hurtSound.volume = 0.5;
   }
-  setAim(aim){this.aim.x = aim.x; this.aim.y = aim.y; return this;}
-  setHP(health){this.health = health; return this;}
-  setGun(gun){this.gun = gun; return this;}
   shootGun(){this.gun.Shoot({...this.position},this.aim.copy().scale(15)); return this;}
-  Tick(time,context){
-    if(this.gun)
-      this.gun.Tick();
-    super.Tick();
-    this.shape.style = drawingUtils.setStyleBasedOnType(this,this.type,time,context);
-  }
-  Tick2(){
+  Tick(){
     if(this.gun)
       this.gun.Tick();
     super.Tick();
@@ -102,6 +84,16 @@ export class Entity extends physObj{//entities are for things that aim in a cert
   }
   applyDamage(source){this.health-=source.damage; this.hurtSound.play(); return this;}
   checkHP(){return this.health < 1;}
+  stayInBounds(context){
+    if(this.position.x < 50)
+      this.velocity.x += 50-this.position.x;
+    if(this.position.x > context.canvas.width - 50)
+      this.velocity.x -= this.position.x - context.canvas.width + 50;
+    if(this.position.y < 50)
+      this.velocity.y += 50-this.position.y;
+    if(this.position.y > context.canvas.height - 50)
+      this.velocity.y -= this.position.y - context.canvas.height + 50;
+  }
 }
 
 export class Player extends Entity{
@@ -118,9 +110,10 @@ export class Player extends Entity{
     this.hurtSound = new Audio("./assets/Oof.mp3");
   }
   Tick(time,context){
-    super.Tick2();
+    super.Tick();
     let playergrd = this.generatePlayerGradient(time,context);
     this.shape.style = playergrd;
+    this.stayInBounds(context);
   }
   Draw(context){
     super.Draw(context);

@@ -24,12 +24,26 @@ export class gun{
       if(this.shotSound!=undefined)
         this.shotSound.play();
       this.ticksToNextShot = this.delay;
-      this.projArray.add(new Projectile).setType(this.type).setDamage(this.damage).setFriction(this.shotFriction).setMass(this.shotMass).setPosition(pos).setVelocity(velocity).setTimeout(this.timeout).setShape(new circle(this.shotSize,pos).setStyle(this.shotStyle));
+      let shot = this.makeShot(pos,velocity);
+      this.projArray.add(shot);
     }
   }
   Tick(){
     if(this.ticksToNextShot)
       this.ticksToNextShot--;
+  }
+  makeShot(pos,velocity){
+    let shot = new Projectile;
+    shot.type = this.type;
+    shot.damage = this.damage;
+    shot.friction = this.shotFriction;
+    shot.mass = this.shotMass;
+    shot.position = pos;
+    shot.velocity = velocity;
+    shot.timeout = this.timeout;
+    shot.shape = new circle(this.shotSize,pos);
+    shot.shape.style = this.shotStyle;
+    return shot;
   }
 }
 
