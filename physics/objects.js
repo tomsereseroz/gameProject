@@ -1,8 +1,8 @@
 import Position from './position.js';
-import Vector from './position.js';
+import Vector from './vector.js';
 import drawingUtils from '../game/drawingUtils.js';
 import { circle } from './shapes.js';
-import {gun} from '../game/guns.js';
+import {gun, shotgun} from '../game/guns.js';
 
 export class Object{
   constructor(position=new Position(10,10),shape={},style='black'){
@@ -73,7 +73,7 @@ export class Entity extends physObj{//entities are for things that aim in a cert
     this.hurtSound = new Audio("../assets/hit.mp3");
     this.hurtSound.volume = 0.5;
   }
-  shootGun(){this.gun.Shoot({...this.position},this.aim.copy().scale(15)); return this;}
+  shootGun(){this.gun.Shoot({...this.position},this.aim.copy()); return this;}
   Tick(){
     if(this.gun)
       this.gun.Tick();
@@ -99,7 +99,7 @@ export class Entity extends physObj{//entities are for things that aim in a cert
 export class Player extends Entity{
   constructor(projArray,position){
     super();
-    this.gun = new gun(projArray);
+    this.gun = new shotgun(projArray);
     this.gun.type = 9999;
     this.type = 9999;
     this.mass = 10;

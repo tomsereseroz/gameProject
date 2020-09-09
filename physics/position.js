@@ -15,7 +15,7 @@ export default class Position {
     return this;
   }
 
-  copy(){//returns new instance of vector with the same properties
+  copy(){
     return new Position(this.x, this.y);
   }
 }

@@ -2,7 +2,8 @@
 import {Projectile} from '../physics/objects.js';
 import {circle} from '../physics/shapes.js';
 
-export class gun{
+
+class basicGun{
   constructor(projArray=[]){
     this.projArray = projArray;
     this.type = 0;
@@ -11,6 +12,7 @@ export class gun{
     this.damage = 10;
     this.shotSize = 10;
     this.shotMass = 10;
+    this.shotSpeed = 30;
     this.shotFriction = 0;
     this.shotStyle = "black";
     this.timeout = 180;
@@ -19,12 +21,13 @@ export class gun{
   }
   setType(type){this.type = type; return this;}
   canShoot(){return this.ticksToNextShot == 0;}
-  Shoot(pos, velocity){
+  Shoot(pos, aim){
+    aim.scale(this.shotSpeed);
     if(this.canShoot()){
       if(this.shotSound!=undefined)
         this.shotSound.play();
       this.ticksToNextShot = this.delay;
-      let shot = this.makeShot(pos,velocity);
+      let shot = this.makeShot(pos,aim);
       this.projArray.add(shot);
     }
   }
@@ -47,3 +50,42 @@ export class gun{
   }
 }
 
+export class gun extends basicGun{
+  constructor(projArray=[]){
+    super(projArray);
+  }
+}
+
+export class shotgun extends basicGun{
+  constructor(projArray=[]){
+    super(projArray);
+    this.numShots = 10;
+    this.shotSize = 8;
+    this.damage = 8;
+    this.delay = 50;
+    this.shotSpread = 0.2;
+    this.shotSound = new Audio("../assets/shotgunBlast.mp3");
+    this.reloadSound = new Audio("../assets/shotgunCock.mp3");
+    this.shotSound.volume = 0.5;
+  }
+  Shoot(pos, aim){
+    if(this.canShoot()){
+      if(this.shotSound!=undefined)
+        this.shotSound.play();
+      this.ticksToNextShot = this.delay;
+      for(let i = 0; i< this.numShots; i++){
+        let newVelocity = aim.copy();
+        newVelocity.scale(this.shotSpeed);
+        newVelocity.scale(Math.random()*0.1+0.95)
+        newVelocity.shiftByRandomAngle(this.shotSpread);
+        let shot = this.makeShot({... pos},newVelocity);
+        this.projArray.add(shot);
+      }
+    }
+  }
+  Tick(){
+    super.Tick();
+    if(this.ticksToNextShot==22)
+      this.reloadSound.play();
+  }
+}

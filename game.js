@@ -35,10 +35,13 @@ let entArray = new entityArray(context);
 
 let playerpos = new position(clientBox.width/2,clientBox.height/2);
 let player = entArray.add(new Player(projArray,playerpos));
+console.log(player.velocity);
+
 drawUtils.drawHPBar(player);
 
 let iH = new inputHandler(player,"gb");
 iH.gamePaused = true;
+
 
 loop();
 
@@ -58,7 +61,7 @@ function loop(){
   }else{
     iH.handleKeyboardAndMouseInput();
   }
-
+  
   projArray.Tick(entArray);
   entArray.Tick(time);
   if(player.health<=0){

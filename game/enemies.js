@@ -19,6 +19,7 @@ export class basicShooter extends Entity{
     this.moveTiming = 70;
     this.moveAngle = 0.2;
     this.moveSpeed = 0.5;
+    this.velocity = new Vector(1,1);
   }
   Tick(player,context){
     super.Tick();
@@ -29,7 +30,7 @@ export class basicShooter extends Entity{
 
     let differenceVector = Vector.differenceVector(this.position,player.position);
     if(differenceVector.magnitude<this.aggroRange)
-      this.gun.Shoot({...this.position},this.aim.copy().scale(15));
+      this.gun.Shoot({...this.position},this.aim.copy());
     this.moveRandomly();  
     this.avoidObject(differenceVector);
     this.stayInBounds(context);
@@ -49,21 +50,14 @@ export class basicShooter extends Entity{
     }
   }
   moveRandomly(){
-    if(!this.moveTiming){//make new moveset
+    if(!this.moveTiming--){//make new moveset
       this.moveTiming = Math.round(Math.random()*140+70);
-      this.moveAngle = Math.random()*0.3-0.15;
-      this.moveSpeed = Math.random()*3+4;
+      this.moveAngle = Math.random()*0.1-0.05;
+      this.moveSpeed = Math.random()*3+3;
     }
-    let velocityMagnitude = this.moveSpeed;//velocity.magnitude;
-    if(velocityMagnitude == undefined)
-      velocityMagnitude = 1;
-    // if(velocityMagnitude<this.moveSpeed)
-    //   velocityMagnitude+=1;
-    let velocityAngle = Math.atan2(this.velocity.y,this.velocity.x);
-    velocityAngle += this.moveAngle;
-    this.velocity.x = velocityMagnitude*Math.cos(velocityAngle);
-    this.velocity.y = velocityMagnitude*Math.sin(velocityAngle);
-    this.moveTiming--;
+    this.velocity.shiftByAngle(this.moveAngle);
+    if(this.velocity.magnitude<this.moveSpeed)
+      this.velocity.scale(1.2);
   }
 }
 
