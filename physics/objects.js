@@ -61,6 +61,11 @@ export class Projectile extends physObj{//projectiles handle collision with enti
     this.timeout = 60;//number of ticks until deletion
   }
   checkTimeout(){return !this.timeout--;}
+  isTimedOut(){return this.timeout <= 0;}
+  tick(){
+    this.timeout--;
+    super.Tick();
+  }
 }
 
 export class Entity extends physObj{//entities are for things that aim in a certaian direction and have health
@@ -84,6 +89,7 @@ export class Entity extends physObj{//entities are for things that aim in a cert
   }
   applyDamage(source){this.health-=source.damage; this.hurtSound.play(); return this;}
   checkHP(){return this.health < 1;}
+  noHP(){return this.health < 1;}
   stayInBounds(context){
     if(this.position.x < 50)
       this.velocity.x += 50-this.position.x;
@@ -126,5 +132,11 @@ export class Player extends Entity{
     playergrd.addColorStop(.8+.1*Math.sin(2*time*Math.PI/3000), "red");
     playergrd.addColorStop(.95+.05*Math.sin(2*time*Math.PI/600), "pink");
     return playergrd;
+  }
+  applyDamage(source){
+    this.health-=source.damage; 
+    this.hurtSound.play();
+    drawingUtils.drawHPBar(this);
+    return this;
   }
 }

@@ -6,6 +6,7 @@ export default function gameOver(contextArray){
   let monoArray = getMonochromeArray(contextArray);
   fadeToMonochrome(contextArray,monoArray);
   setTimeout(displayGO,2250);
+  setTimeout(displayRestartOptions,3550);
 }
 
 function fadeToMonochrome(contextArray,imgDataArray,iteration=0){
@@ -15,12 +16,13 @@ function fadeToMonochrome(contextArray,imgDataArray,iteration=0){
     let pixels = imgData.data;
     let monochromePixels = imgDataArray[index].data;
     for(var i=0,n=pixels.length;i<n;i+=4){
-      for(var j = 0;j<3;j++){
-        let sample = pixels[i+j];
-        sample = sample*9 + monochromePixels[i+j];
-        sample = sample/10
-        pixels[i+j] = sample;
-      }
+      if(pixels[i+3])//checks that alpha layer != 0
+        for(var j = 0;j<3;j++){
+          let sample = pixels[i+j];
+          sample = sample*9 + monochromePixels[i+j];
+          sample = sample/10;
+          pixels[i+j] = sample;
+        }
     }
     context.putImageData(imgData,0,0);
   });
@@ -65,4 +67,22 @@ function displayGO(){
   a.appendChild(node);
   var stage = document.getElementById("stage");
   stage.appendChild(a);
+}
+
+function displayRestartOptions(){
+  var a = document.createElement("button");
+  a.style = "position:absolute; top:70%; right:70%; z-index:4; font-size: 40px; color: black; transform: translate(50%, -50%); font-family: Impact; user-select: none; border-color: black";
+  var node = document.createTextNode("Main Menu");
+  a.appendChild(node);
+  var stage = document.getElementById("stage");
+  a.onclick = ()=>{location.reload()};
+  stage.appendChild(a);
+  
+  var b = document.createElement("button");
+  b.style = "position:absolute; top:70%; right:30%; z-index:4; font-size: 40px; color: black; transform: translate(50%, -50%); font-family: Impact; user-select: none; border-color: black";
+  var node = document.createTextNode("Restart");
+  b.appendChild(node);
+  var stage = document.getElementById("stage");
+  b.onclick = ()=>{location.reload()};
+  stage.appendChild(b);
 }

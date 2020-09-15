@@ -14,7 +14,7 @@ export class basicShooter extends Entity{
     this.gun.delay = 30;
     this.gun.shotStyle = "red";
     this.shape = new circle(25);
-    this.deathSound = new Audio("./assets/bleh.mp3");
+    this.deathPath = "./assets/bleh.mp3";
     this.aggroRange = 900;
     this.moveTiming = 70;
     this.moveAngle = 0.2;
@@ -59,6 +59,12 @@ export class basicShooter extends Entity{
     if(this.velocity.magnitude<this.moveSpeed)
       this.velocity.scale(1.2);
   }
+  applyDamage(source){
+    this.health-=source.damage; 
+    this.hurtSound.play();
+    this.aggroRange = 2000;
+    return this;
+  }
 }
 
 export class basicMelee extends Entity{
@@ -69,7 +75,7 @@ export class basicMelee extends Entity{
     this.health = 100;
     this.shape = new circle(30);
     this.damage = 50;
-    this.deathSound = new Audio("./assets/bleh.mp3");
+    this.deathPath = "./assets/bleh.mp3"
     this.aggroRange = 500;
   }
   Tick(player,context){
@@ -90,5 +96,11 @@ export class basicMelee extends Entity{
     grd.addColorStop(this.health/(this.maxHealth+1), "red");
     grd.addColorStop(1, "black");
     return grd;
+  }
+  applyDamage(source){
+    this.health-=source.damage; 
+    this.hurtSound.play();
+    this.aggroRange = 2000;
+    return this;
   }
 }

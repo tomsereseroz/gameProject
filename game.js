@@ -6,7 +6,7 @@ import position from './physics/position.js';
 import inputHandler from './interface/inputHandler.js';
 import {Entity, Player} from './physics/objects.js';
 import {gun} from './game/guns.js';
-import {projectileArray, entityArray} from './game/objectArrays.js';
+import {projectileArray, entityArray, objectHandler} from './game/objectArrays.js';
 import Position from './physics/position.js';
 import eventListeners from './interface/listeners.js';
 import gameOver from './game/gameOver.js';
@@ -30,12 +30,13 @@ let lasttime = time;
 let framerate = 70;
 let msDelay = 1000/framerate;
 
+let oH = new objectHandler(contextArray);
+
 let projArray = new projectileArray(context);
 let entArray = new entityArray(context);
 
 let playerpos = new position(clientBox.width/2,clientBox.height/2);
 let player = entArray.add(new Player(projArray,playerpos));
-console.log(player.velocity);
 
 drawUtils.drawHPBar(player);
 
