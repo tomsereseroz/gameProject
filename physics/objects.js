@@ -17,10 +17,9 @@ export class Object{
 }
 
 export class physObj extends Object{
-  constructor(position,shape,style,velocity=new Vector(0,0),type=0,mass=1,friction=.1,acceleration=1,damage=0){
+  constructor(position,shape,style,velocity=new Vector(0,0),mass=1,friction=.1,acceleration=1,damage=0){
     super(position,shape,style);
     this.velocity = velocity;//velocity.x , .y
-    this.type = type;//type for collisions(collisions are ignored for similar types)
     this.mass = mass;//mass
     this.friction = friction;//friction constant should be 0 to 1.
     this.acceleration = acceleration;
@@ -106,8 +105,6 @@ export class Player extends Entity{
   constructor(projArray,position){
     super();
     this.gun = new shotgun(projArray);
-    this.gun.type = 9999;
-    this.type = 9999;
     this.mass = 10;
     this.friction = 0.05;
     this.health = 490;

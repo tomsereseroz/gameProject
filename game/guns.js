@@ -6,7 +6,6 @@ import {circle} from '../physics/shapes.js';
 class basicGun{
   constructor(projArray=[]){
     this.projArray = projArray;
-    this.type = 0;
     this.delay = 8;
     this.ticksToNextShot = 0;
     this.damage = 10;
@@ -19,7 +18,6 @@ class basicGun{
     this.shotSound = new Audio("../assets/snap.mp3");
     this.shotSound.volume = 0.05;
   }
-  setType(type){this.type = type; return this;}
   canShoot(){return this.ticksToNextShot == 0;}
   Shoot(pos, aim){
     aim.scale(this.shotSpeed);
@@ -28,7 +26,7 @@ class basicGun{
         this.shotSound.play();
       this.ticksToNextShot = this.delay;
       let shot = this.makeShot(pos,aim);
-      this.projArray.add(shot);
+      this.projArray[this.projArray.length] = shot;
     }
   }
   Tick(){
@@ -37,7 +35,6 @@ class basicGun{
   }
   makeShot(pos,velocity){
     let shot = new Projectile;
-    shot.type = this.type;
     shot.damage = this.damage;
     shot.friction = this.shotFriction;
     shot.mass = this.shotMass;
@@ -79,7 +76,7 @@ export class shotgun extends basicGun{
         newVelocity.scale(Math.random()*0.1+0.95)
         newVelocity.shiftByRandomAngle(this.shotSpread);
         let shot = this.makeShot({... pos},newVelocity);
-        this.projArray.add(shot);
+        this.projArray[this.projArray.length] = shot
       }
     }
   }

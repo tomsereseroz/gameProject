@@ -15,6 +15,7 @@ export default class inputHandler{
     document.getElementById("pauseMenu").children[1].addEventListener("click", () => {
       if(confirm("Are you sure you want to return to the main menu? your progress will be lost."))
         location.reload();
+      else document.getElementById("pauseMenu").style = "display: flex";
     } );
     this.pauseButton = [0,0];
   }

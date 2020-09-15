@@ -6,10 +6,9 @@ import position from './physics/position.js';
 import inputHandler from './interface/inputHandler.js';
 import {Entity, Player} from './physics/objects.js';
 import {gun} from './game/guns.js';
-import {projectileArray, entityArray, objectHandler} from './game/objectArrays.js';
+import {objectHandler} from './game/objectArrays.js';
 import Position from './physics/position.js';
 import eventListeners from './interface/listeners.js';
-import gameOver from './game/gameOver.js';
 import {basicShooter, basicMelee} from './game/enemies.js';
 
 console.log('game.js');
@@ -22,7 +21,7 @@ let contextArray = [bgcontext,context,uicontext];//ordered from background to fo
 let numpads = 0;//number of connected gamepads
 
 let eventListenerHandler = new eventListeners(contextArray,numpads);
-let clientBox = eventListenerHandler.clientBox;
+let clientBox = eventListenerHandler.clientBox;//updates on window resize event
 
 let time = Date.now();
 let lasttime = time;
@@ -30,17 +29,17 @@ let lasttime = time;
 let framerate = 70;
 let msDelay = 1000/framerate;
 
-let oH = new objectHandler(contextArray);
-
-let projArray = new projectileArray(context);
-let entArray = new entityArray(context);
+let oH = new objectHandler(contextArray,eventListenerHandler);
 
 let playerpos = new position(clientBox.width/2,clientBox.height/2);
-let player = entArray.add(new Player(projArray,playerpos));
+let player = new Player(oH.projectileHandler.playerArray,playerpos);
+
+oH.addEntity("player",player);
 
 drawUtils.drawHPBar(player);
 
 let iH = new inputHandler(player,"gb");
+
 iH.gamePaused = true;
 
 
@@ -63,22 +62,14 @@ function loop(){
     iH.handleKeyboardAndMouseInput();
   }
   
-  projArray.Tick(entArray);
-  entArray.Tick(time);
-  if(player.health<=0){
-    gameOver(contextArray);
-    return;
-  }
-  context.clearRect(0, 0, clientBox.width, clientBox.height);
-  entArray.Draw(context);
-  projArray.Draw(context);
-  physicsUtils.screenWrap(player,clientBox.width,clientBox.height);
-  if(entArray.array.length < 5){
+  if(oH.tick(time)){ iH.kI.removeCallback("Escape"); return;} //oH calls gameOver
+
+  if(oH.entityHandler.enemyArray.length < 4){
     let enemy;
     if(Math.random()<0.5){
-      enemy = entArray.add(new basicMelee);
+      enemy = new basicMelee;
     }else{
-      enemy = entArray.add(new basicShooter(projArray));
+      enemy = new basicShooter(oH.projectileHandler.enemyArray);
     }
     enemy.position = new position(Math.random()*clientBox.width,Math.random()*clientBox.height);
     enemy.shape.position = enemy.position;
@@ -86,6 +77,7 @@ function loop(){
       enemy.position = new Position(Math.random()*clientBox.width,Math.random()*clientBox.height);
       enemy.shape.position = enemy.position;
     };
+    oH.entityHandler.enemyArray[oH.entityHandler.enemyArray.length] = enemy;
   }
 
   window.requestAnimationFrame(loop);
