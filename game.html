@@ -6,8 +6,6 @@
 </head>
 <script type='module' src="game.js"></script>
 <body>
-	<img id="heart" src="./assets/40x36heart.png"/>
-	<img id="emptyheart" src="./assets/40x36emptyheart.png"/>
 	<div id="stage">
 		<canvas id="gb"></canvas>
 		<canvas id="ui-layer" width="480" height="320"></canvas>
@@ -22,6 +20,9 @@
 		<button type="button" onclick="this.parentElement.style = 'display:none;';" >Resume</button>
 		<button type="button" onclick="this.parentElement.style = 'display:none;';">Main Menu</button>
 	</div>
+	<div id="healthbar"><div id="health"></div></div>
+	<div id="score"><pre>Score: </pre><pre id="scorenum">0</pre></div>
+	<object id="svg-object" data="./assets/ambiance.svg" type="image/svg+xml"></object>
 </body>
 
 <style>
@@ -29,15 +30,23 @@
 
 		img {display: none;}
 
+		#svg-object{
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			opacity: 0.3;
+			z-index: 1;
+		}
+
 		#stage {
 			width: 100%;
 			height: 100%;
-			position: relative;
+			position: absolute;
 			border: none;
   	}
 
 		canvas { position: absolute; }
-		#mainMenu, #pauseMenu { 
+		#mainMenu, #pauseMenu, #score{ 
 			z-index: 4; 
 			position: absolute; 
 			display: flex;
@@ -47,7 +56,37 @@
 			left: 50%;
    		transform: translate(-50%, -50%);
 		}
-		
+		#healthbar {
+			position:absolute;
+			width: 500px;
+			height: 51px;
+			top: 35px;
+			left:50%;
+			transform: translate(-50%,-50%);
+			z-index: 4;
+			background-color: black;
+			border-radius: 15px;
+		}
+		#score{
+			flex-direction: row;
+			background-color: rgba(0,0,0,0.5);
+			border-radius: 15px;
+			padding: 10px;
+			color: blanchedalmond;
+			top: 45px;
+			left: 150px;
+			font-size: 3em;
+			align-content: center;
+			user-select: none;
+		}
+		#health{
+			height: 40px;
+			width: 50%;
+			border-radius: 10px;
+			transform: translate(5px,5px);
+			background-color: red;
+			z-index: 4;
+		}
 		button {
 			font-weight: bold;
 			font-size: 4em;
@@ -55,16 +94,15 @@
 			margin: 20px;
 			border-radius: 5px;
 			border-color: rgb(223, 204, 32);
-			background-color:rgba(80,80,90,0.8);
+			background-color:rgb(80,80,90);
 			user-select: none;
 		}
-
-		#pauseMenu {
+		#mainMenu {
 			font-size: 0.5em;
 			display: none;
 		}
 		button:hover {
-			background-color:rgba(120,120,140,0.8);
+			background-color:rgb(120,120,140);
 		}
 		#ui-layer { z-index: 3; }
 		#game-layer { z-index: 2; }

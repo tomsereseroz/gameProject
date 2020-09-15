@@ -14,4 +14,8 @@ export default class Position {
     this.y *= factor;
     return this;
   }
+
+  copy(){
+    return new Position(this.x, this.y);
+  }
 }
