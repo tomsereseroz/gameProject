@@ -1,6 +1,5 @@
-
-import {Projectile} from '../physics/objects.js';
-import {circle} from '../physics/shapes.js';
+import {Projectile} from '../../physics/objects.js';
+import {circle} from '../../physics/shapes.js';
 
 
 class basicGun{

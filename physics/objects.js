@@ -2,7 +2,7 @@ import Position from './position.js';
 import Vector from './vector.js';
 import drawingUtils from '../game/drawingUtils.js';
 import { circle } from './shapes.js';
-import {gun, shotgun} from '../game/guns.js';
+import {gun, shotgun} from '../game/gameObjects/guns.js';
 
 export class Object{
   constructor(position=new Position(10,10),shape={},style='black'){

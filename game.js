@@ -1,15 +1,13 @@
-import physicsUtils from './physics/physicsUtils.js';
 import drawUtils from './game/drawingUtils.js';
 import Vector from './physics/vector.js';
-import {circle} from './physics/shapes.js';
 import position from './physics/position.js';
 import inputHandler from './interface/inputHandler.js';
-import {Entity, Player} from './physics/objects.js';
-import {gun} from './game/guns.js';
-import {objectHandler} from './game/objectArrays.js';
+import Player from './game/gameObjects/player.js';
+import {objectHandler} from './game/gameObjects/objectHandlers.js';
 import Position from './physics/position.js';
 import eventListeners from './interface/listeners.js';
-import {basicShooter, basicMelee} from './game/enemies.js';
+import {basicShooter, basicMelee} from './game/gameObjects/enemies.js';
+import hslWalker from './coolStuff/colorWalk.js';
 
 console.log('game.js');
 
@@ -18,9 +16,9 @@ let uicontext = document.getElementById("ui-layer").getContext("2d");
 let bgcontext = document.getElementById("background-layer").getContext("2d", { alpha: false });
 let contextArray = [bgcontext,context,uicontext];//ordered from background to foreground
 
-let numpads = 0;//number of connected gamepads
+let backGroundDrawer = new hslWalker(bgcontext);
 
-let eventListenerHandler = new eventListeners(contextArray,numpads);
+let eventListenerHandler = new eventListeners(contextArray,backGroundDrawer);
 let clientBox = eventListenerHandler.clientBox;//updates on window resize event
 
 let time = Date.now();
@@ -46,6 +44,8 @@ iH.gamePaused = true;
 loop();
 
 function loop(){
+  backGroundDrawer.draw(bgcontext);
+
   time = Date.now();
   
   if(iH.gamePaused||time-lasttime<msDelay){//this locks the game to run at [framerate] so it doesn't run too fast on 144hz+ monitors

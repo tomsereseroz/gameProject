@@ -1,9 +1,9 @@
-import physicsUtils from '../physics/physicsUtils.js';
-import drawingUtils from '../game/drawingUtils.js';
-import Vector from '../physics/vector.js';
-import {Player} from '../physics/objects.js';
-import {basicShooter, basicMelee} from '../game/enemies.js';
-import gameOver from './gameOver.js';
+import physicsUtils from '../../physics/physicsUtils.js';
+import drawingUtils from '../drawingUtils.js';
+import Vector from '../../physics/vector.js';
+import Player from './player.js';
+import {basicShooter, basicMelee} from './enemies.js';
+import gameOver from '../gameOver.js';
 
 export class objectHandler{
   constructor(contextArray,eventListenerHandler){

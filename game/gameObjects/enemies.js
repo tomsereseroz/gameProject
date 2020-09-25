@@ -1,8 +1,8 @@
-import { Entity } from '../physics/objects.js';
+import { Entity } from '../../physics/objects.js';
 import {gun} from './guns.js';
-import phUtils from '../physics/physicsUtils.js';
-import { circle } from '../physics/shapes.js';
-import Vector from '../physics/vector.js';
+import phUtils from '../../physics/physicsUtils.js';
+import { circle } from '../../physics/shapes.js';
+import Vector from '../../physics/vector.js';
 
 export class basicShooter extends Entity{
   constructor(projectileArray){
