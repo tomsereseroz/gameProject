@@ -7,6 +7,7 @@ import gameOver from '../gameOver.js';
 
 export class objectHandler{
   constructor(contextArray,eventListenerHandler){
+    this.globalVolume = 1;
     this.elh = eventListenerHandler;
     this.contextArray = contextArray;
     this.projectileHandler = new projectileHandler();
@@ -15,33 +16,30 @@ export class objectHandler{
   tick(time){
     if( this.projectileHandler.tick(this.entityHandler,this.contextArray[1]) || 
         this.entityHandler.tick(time,this.contextArray[1])){
-      gameOver(this.contextArray);
+      gameOver(this.contextArray,this.globalVolume);
       return true;
     }
     this.contextArray[1].clearRect(0, 0, this.elh.clientBox.width, this.elh.clientBox.height);
     this.draw();
     return false;
   }
-  addEntity(type,entity){
-    this.add(this.entityHandler,type,entity);
+  addPlayer(player){
+    player.setVolume(this.globalVolume);
+    let playerArray = this.entityHandler.playerArray;
+    playerArray[playerArray.length] = player;
   }
-  addProjectile(type,projectile){
-    this.add(this.projectileHandler,type,projectile);
+  addEnemy(enemy){
+    enemy.setVolume(this.globalVolume);
+    let enemyArray = this.entityHandler.enemyArray;
+    enemyArray[enemyArray.length] = enemy;
   }
-  add(handler,type,object){
-    let array;
-    switch(type){
-      case "enemy":
-        array = handler.enemyArray;
-        break;
-      case "player":
-        array = handler.playerArray;
-        break;
-      default:
-        console.log("invalid type given");
-        break;
-    }
-    array[array.length] = object;
+  addPlayerProjectile(projectile){
+    let playerArray = this.projectileHandler.playerArray;
+    playerArray[playerArray.length] = projectile;
+  }
+  addEnemyProjectile(projectile){
+    let enemyArray = this.projectileHandler.enemyArray;
+    enemyArray[enemyArray.length] = projectile;
   }
   draw(){
     this.drawArray(this.entityHandler.playerArray);
@@ -52,10 +50,24 @@ export class objectHandler{
   drawArray(array){
     for(let i = 0; i < array.length; i++) array[i].Draw(this.contextArray[1]);
   }
+  setVolume(volume){
+    this.globalVolume = volume;
+    this.projectileHandler.globalVolume = volume;
+    let arrays = [this.entityHandler.playerArray,
+                  this.entityHandler.enemyArray,
+                  this.projectileHandler.playerArray,
+                  this.projectileHandler.enemyArray];
+    arrays.forEach((array)=>{
+      for(let i = 0; i < array.length; i++) 
+        if(array[i].setVolume)
+          array[i].setVolume(volume);
+    })
+  }
 }
 
 class projectileHandler{
   constructor(){
+    this.globalVolume = 1;
     this.playerArray = [];
     this.enemyArray = [];
     //maybe add more arrays for multiple players in the future
@@ -79,6 +91,7 @@ class projectileHandler{
             if(entity.noHP()){
               if(entity instanceof Player) return true;
               let deathSound = new Audio(entity.deathPath);
+              deathSound.volume = this.globalVolume;
               deathSound.play();
               addToScore(entity.maxHealth);
               entityArray.splice(j,1);

@@ -65,6 +65,11 @@ export class basicShooter extends Entity{
     this.aggroRange = 2000;
     return this;
   }
+  setVolume(volume){
+    if(this.gun.setVolume)
+      this.gun.setVolume(volume);
+    super.setVolume(volume);
+  }
 }
 
 export class basicMelee extends Entity{

@@ -1,5 +1,3 @@
-//import hslWalker from '../coolStuff/colorWalk.js';
-
 export default class eventListeners{
   constructor(contextArray,hslWalker){
     this.hslWalker = hslWalker;
@@ -22,6 +20,6 @@ export default class eventListeners{
       });
       this.hslWalker.updateSize(this.contextArray[0]);
     });
-    window.addEventListener("contextmenu",(e)=>{e.preventDefault();},false);
+    window.addEventListener("contextmenu",(e)=>{e.preventDefault();},false);//prevents right-click menu
   }
 }

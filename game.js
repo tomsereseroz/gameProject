@@ -8,8 +8,12 @@ import Position from './physics/position.js';
 import eventListeners from './interface/listeners.js';
 import {basicShooter, basicMelee} from './game/gameObjects/enemies.js';
 import hslWalker from './coolStuff/colorWalk.js';
+import {initializeUI, showPauseMenu, hidePauseMenu} from './interface/userInterface.js';
 
 console.log('game.js');
+
+initializeUI();
+showPauseMenu();
 
 let context = document.getElementById("gb").getContext("2d");
 let uicontext = document.getElementById("ui-layer").getContext("2d");
@@ -32,14 +36,13 @@ let oH = new objectHandler(contextArray,eventListenerHandler);
 let playerpos = new position(clientBox.width/2,clientBox.height/2);
 let player = new Player(oH.projectileHandler.playerArray,playerpos);
 
-oH.addEntity("player",player);
+oH.addPlayer(player);
 
 drawUtils.drawHPBar(player);
 
-let iH = new inputHandler(player,"gb");
+let iH = new inputHandler(player,"gb",oH);
 
 iH.gamePaused = true;
-
 
 loop();
 
@@ -77,7 +80,7 @@ function loop(){
       enemy.position = new Position(Math.random()*clientBox.width,Math.random()*clientBox.height);
       enemy.shape.position = enemy.position;
     };
-    oH.entityHandler.enemyArray[oH.entityHandler.enemyArray.length] = enemy;
+    oH.addEnemy(enemy);
   }
 
   window.requestAnimationFrame(loop);

@@ -1,23 +1,26 @@
 import mouseInterface from './mouseInterface.js';
 import keyboardInterface from './keyboardInterface.js';
 import physicsUtils from '../physics/physicsUtils.js';
+import {showPauseMenu, hidePauseMenu} from './userInterface.js';
+
+//this should be constructed after initializeUI is called from userInterface.js
 
 export default class inputHandler{
-  constructor(player,canvasID){
+  constructor(player,canvasID,objectHandler){
     this.player = player;//I dont really like how player has to be a member here
     this.gamePaused = false;
+    this.oH = objectHandler;
     this.kI = new keyboardInterface();
     this.mI = new mouseInterface(canvasID);
     this.kI.addWatcher('KeyW').addWatcher('KeyA').addWatcher('KeyS').addWatcher('KeyD');
     this.kI.addWatcher('ArrowUp').addWatcher('ArrowDown').addWatcher('ArrowLeft').addWatcher('ArrowRight');
-    this.kI.addCallback('Escape',[togglePause,this]);//todo: make this available only once game has started
-    document.getElementById("pauseMenu").children[0].addEventListener("click", () => {this.gamePaused = false;} );
-    document.getElementById("pauseMenu").children[1].addEventListener("click", () => {
-      if(confirm("Are you sure you want to return to the main menu? your progress will be lost."))
-        location.reload();
-      else document.getElementById("pauseMenu").style = "display: flex";
-    } );
+    this.kI.addCallback('Escape',[togglePause,this]);
+    document.getElementById("resumeButton").addEventListener("click", () => {this.gamePaused = false;} );
     this.pauseButton = [0,0];
+    let volumeSlider = document.getElementById('volumeSlider');
+    volumeSlider.oninput = () => {
+      this.oH.setVolume(volumeSlider.value / 100);
+    }
   }
   handleKeyboardAndMouseInput(){//maybe have this method take player as an input instead of the constructor
     physicsUtils.aimAtCoords(this.player,this.mI.mousePosition);
@@ -70,7 +73,7 @@ function checkButton(inputHandler,button,index){
 function togglePause(inputHandler){
   inputHandler.gamePaused = !inputHandler.gamePaused;
   if(inputHandler.gamePaused)
-    document.getElementById("pauseMenu").style = "display: flex"
+    showPauseMenu();
   else
-  document.getElementById("pauseMenu").style = "display: none"
+    hidePauseMenu();
 }

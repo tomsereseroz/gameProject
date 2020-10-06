@@ -38,4 +38,8 @@ export default class Player extends Entity{
     drawingUtils.drawHPBar(this);
     return this;
   }
+  setVolume(volume){
+    this.hurtSound.volume = volume;
+    this.gun.setVolume(volume);
+  }
 }
