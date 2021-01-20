@@ -10,6 +10,7 @@ export function hidePauseMenu(){
 
 export function initializeUI(){
   createPauseMenu();
+  createShieldBar();
 }
 
 function createPauseMenu(){
@@ -67,4 +68,27 @@ function createPauseMenu(){
   pauseMenuDiv.appendChild(mainMenuButton);
 
   document.body.appendChild(pauseMenuDiv);
+}
+
+function createShieldBar(){
+  let shieldDiv = document.createElement('div');
+  shieldDiv.style.position = 'absolute';
+  shieldDiv.style.top = "10px";
+  shieldDiv.style.right = '30px';
+  shieldDiv.style.backgroundColor = 'black';
+  shieldDiv.style.zIndex = '4';
+  shieldDiv.style.width = '220px';
+  shieldDiv.style.height = '50px';
+  shieldDiv.style.borderRadius = '15px';
+  let shieldEnergy = document.createElement('div');
+  shieldEnergy.setAttribute('id','shieldEnergy');
+  shieldEnergy.style.backgroundColor = 'cyan';
+  shieldEnergy.style.width = '200px';
+  shieldEnergy.style.height = '30px';
+  shieldEnergy.style.borderRadius = '10px';
+  shieldEnergy.style.padding = '5px';
+  shieldEnergy.style.transform = 'translate(5px,5px)';
+
+  shieldDiv.appendChild(shieldEnergy);
+  document.body.appendChild(shieldDiv);
 }

@@ -34,6 +34,8 @@ export default class inputHandler{
       this.player.velocity.x += this.player.acceleration;
     if(this.mI.mouseDown)
       this.player.shootGun();
+    if(this.mI.rightMouseDown)
+      this.player.activateShield(this.oH);
   }
   handleGamepadInput(){
   //follows 'standard gamepad input' and assumes player is using gamepad[0]
@@ -65,6 +67,7 @@ function checkButton(inputHandler,button,index){
   if(button.value){
     switch(index){
       case 7: inputHandler.player.shootGun(); break;//7 = trigger
+      case 6: inputHandler.player.activateShield(inputHandler.oH); break;
       default:
     }
   }

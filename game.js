@@ -6,7 +6,7 @@ import Player from './game/gameObjects/player.js';
 import {objectHandler} from './game/gameObjects/objectHandlers.js';
 import Position from './physics/position.js';
 import eventListeners from './interface/listeners.js';
-import {basicShooter, basicMelee} from './game/gameObjects/enemies.js';
+import {basicShooter, basicMelee, bigMelee} from './game/gameObjects/enemies.js';
 import hslWalker from './coolStuff/colorWalk.js';
 import {initializeUI, showPauseMenu, hidePauseMenu} from './interface/userInterface.js';
 
@@ -69,11 +69,13 @@ function loop(){
 
   if(oH.entityHandler.enemyArray.length < 4){
     let enemy;
-    if(Math.random()<0.5){
+    let randomNumber = Math.random();
+    if(randomNumber < 0.1)
       enemy = new basicMelee;
-    }else{
+    else if(randomNumber > 0.9)
       enemy = new basicShooter(oH.projectileHandler.enemyArray);
-    }
+    else
+      enemy = new bigMelee(oH);
     enemy.position = new position(Math.random()*clientBox.width,Math.random()*clientBox.height);
     enemy.shape.position = enemy.position;
     while(Vector.differenceVector(player.position, enemy.position).magnitude<300){

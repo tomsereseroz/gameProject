@@ -84,16 +84,18 @@ class projectileHandler{
       if(projectile.isTimedOut()||!projectile.shape.isOnScreen(context)){
         deleted = true;
       }else{
-        for(var j = 0; j<entityArray.length; j++){
+        for(var j = entityArray.length-1; j>=0; j--){//loops from end to beginning because shield is at the end of the array
           let entity = entityArray[j];
           if(projectile.collidesWith(entity)){
             entity.applyDamage(projectile).absorbMomentum(projectile);
             if(entity.noHP()){
               if(entity instanceof Player) return true;
-              let deathSound = new Audio(entity.deathPath);
-              deathSound.volume = this.globalVolume;
-              deathSound.play();
-              addToScore(entity.maxHealth);
+              if(entity.deathPath){
+                let deathSound = new Audio(entity.deathPath);
+                deathSound.volume = this.globalVolume;
+                deathSound.play();
+                addToScore(entity.maxHealth);
+              }
               entityArray.splice(j,1);
             }
             deleted = true;
@@ -124,19 +126,29 @@ class entityHandler{
       }
       for(var j = 0; j < this.playerArray.length; j++){
         let player = this.playerArray[j];
-        if(ent1.collidesWith(player)) handleEntityCollision(ent1, player);
-        if(player.noHP()) return true;
+        if(ent1.collidesWith(player)){
+          physicsUtils.moveApart(ent1,player);
+          handleEntityCollision(ent1, player);
+        }
+        if(player.noHP()){
+          if(player instanceof Player)
+            return true;
+          this.playerArray.splice(j,1);
+        } 
       }
       ent1.Tick(this.playerArray[0],context);
     }
-    for(var i = 0; i < this.playerArray.length; i++ )
+    for(var i = 0; i < this.playerArray.length; i++ ){
       this.playerArray[i].Tick(time,context);
+      if(this.playerArray[i].noHP())
+        this.playerArray.splice(i,1);
+    }
     return false;
   }
 }
 
 function handleEntityCollision(object1,object2){
-  object1.tradeMomentum(object2);
+  object1.bounce(object2);
   if(object1.damage)
     damageObject(object1,object2);
   if(object2.damage)

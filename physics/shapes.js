@@ -14,16 +14,6 @@ class shape{
     this.style = style;
     return this;
   }
-  collidesWith(other){
-    if (Object.getPrototypeOf(this) == Object.getPrototypeOf(other))//type checking
-      return this.homogenousCollision(other);
-    else{
-      if(this instanceof circle)
-        return RectangleAndCircleCollide(other,this);
-      else
-        return RectangleAndCircleCollide(this,other);
-    }
-  }
 }
 
 export class circle extends shape{
@@ -53,6 +43,16 @@ export class circle extends shape{
     let yDistance = Math.abs(this.position.y - other.position.y);
     let combinedRadii = this.radius + other.radius;
     return (xDistance*xDistance + yDistance*yDistance) < combinedRadii*combinedRadii
+  }
+  collidesWith(other){
+    if (Object.getPrototypeOf(this) == Object.getPrototypeOf(other))//type checking
+      return this.homogenousCollision(other);
+    else{
+      if(other instanceof rectangle)
+        return RectangleAndCircleCollide(other,this);
+      else if(other instanceof arc)
+        return ArcAndCircleCollide(other,this);
+    }
   }
 }
 
@@ -98,6 +98,31 @@ export class rectangle extends shape{
   }
 }
 
+export class arc extends shape{
+  constructor(radius=10,position=new Position(10,10),style='black',startAngle=0,endAngle=Math.PI/2,lineWidth='15'){
+    super(position,style);
+    this.radius = radius;
+    this.startAngle = startAngle;
+    this.endAngle = endAngle;
+    this.width = lineWidth;
+  }
+  //utility
+  draw(context){
+    context.strokeStyle = this.style;
+    context.beginPath();
+    context.arc(this.position.x,this.position.y,this.radius,-this.startAngle,-this.endAngle,true);
+    context.lineWidth = this.width;
+    context.lineCap = 'round';
+    context.stroke();
+  }
+  isOnScreen(context){
+    return (this.position.x + this.radius > 0 && this.position.x - this.radius < context.canvas.width && this.position.y + this.radius > 0 && this.position.y - this.radius < context.canvas.height)
+  }
+  collidesWith(other){//assuming circle collisions only
+    return ArcAndCircleCollide(this,other);
+  }
+}
+
 function RectangleAndCircleCollide(rectangle,circle){
   let rectangleCenter = rectangle.center;
   let xDistance = Math.abs(circle.position.x - rectangleCenter.x);
@@ -111,4 +136,22 @@ function RectangleAndCircleCollide(rectangle,circle){
 
   let edgeCase_Distance = (xDistance - rectangle.halfWidth)*(xDistance - rectangle.halfWidth) + (yDistance - rectangle.halfHeight)*(yDistance - rectangle.halfHeight);
   return edgeCase_Distance <= circle.radius*circle.radius;
+}
+
+function ArcAndCircleCollide(arc,circle){
+  if(arcAndCirclePossiblyCollide(arc,circle)){
+    let xdistance = circle.position.x - arc.position.x;
+    let ydistance = circle.position.y - arc.position.y;
+    let distanceAngle = Math.atan2(-ydistance,xdistance);
+    if((distanceAngle >= arc.startAngle-0.3)&&(distanceAngle <= arc.endAngle+0.3))
+      return true;
+  }
+  return false;
+}
+
+function arcAndCirclePossiblyCollide(arc,circle){
+  let xDistance = Math.abs(arc.position.x-circle.position.x);
+  let yDistance = Math.abs(arc.position.y - circle.position.y);
+  let combinedRadii = arc.radius + arc.width/2 + circle.radius;
+  return (xDistance*xDistance + yDistance*yDistance) < combinedRadii*combinedRadii
 }

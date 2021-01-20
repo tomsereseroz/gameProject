@@ -52,6 +52,17 @@ export class physObj extends Object{
     other.velocity = finalVelocity2;
     return this;
   }
+  bounce(other){
+    let differenceVector = Vector.differenceVector(this.position,other.position);
+    differenceVector = differenceVector.unitVector;
+    let massRatio = other.mass/this.mass;
+    massRatio = Math.min(massRatio, 3);
+    massRatio = Math.max(massRatio, 0.3)
+    this.velocity.x -= differenceVector.x*10*massRatio;
+    this.velocity.y -= differenceVector.y*10*massRatio;
+    other.velocity.x += differenceVector.x*10/massRatio;
+    other.velocity.y += differenceVector.y*10/massRatio;
+  }
 }
 
 export class Projectile extends physObj{//projectiles handle collision with entities
@@ -72,8 +83,7 @@ export class Entity extends physObj{//entities are for things that aim in a cert
     super();
     this.aim = new Vector(0,0);//aim.x, .y
     this.health = 10;
-    this.gun = 0;
-    this.moveFunction;
+    this.gun = undefined;
     this.hurtSound = new Audio("../assets/hit.mp3");
     this.hurtSound.volume = 0.5;
   }
