@@ -18,6 +18,7 @@ export default class inputHandler{
     document.getElementById("resumeButton").addEventListener("click", () => {this.gamePaused = false;} );
     this.pauseButton = [0,0];
     let volumeSlider = document.getElementById('volumeSlider');
+    this.oH.setVolume(volumeSlider.value / 100);
     volumeSlider.oninput = () => {
       this.oH.setVolume(volumeSlider.value / 100);
     }

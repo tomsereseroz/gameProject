@@ -60,7 +60,7 @@ function createPauseMenu(){
   volumeSlider.setAttribute('type','range');
   volumeSlider.style.position = 'relative';
   volumeSlider.style.top = '10px';
-  volumeSlider.value = 100;
+  volumeSlider.value = 10;
   volumeControlDiv.appendChild(volumeSlider);
   
   pauseMenuDiv.appendChild(resumeButton);

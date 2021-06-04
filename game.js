@@ -70,9 +70,9 @@ function loop(){
   if(oH.entityHandler.enemyArray.length < 4){
     let enemy;
     let randomNumber = Math.random();
-    if(randomNumber < 0.1)
+    if(randomNumber < 0.3)
       enemy = new basicMelee;
-    else if(randomNumber > 0.9)
+    else if(randomNumber > 0.5)
       enemy = new basicShooter(oH.projectileHandler.enemyArray);
     else
       enemy = new bigMelee(oH);

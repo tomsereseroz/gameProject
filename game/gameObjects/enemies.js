@@ -120,8 +120,8 @@ export class bigMelee extends Entity{
     this.shape = new circle(60);
     this.damage = 80;
     this.deathPath = "./assets/bleh.mp3"
-    this.ticksToMove = 30 + Math.floor(Math.random()*15);
-    this.friction = 0.05;
+    this.ticksToMove = 80 + Math.floor(Math.random()*20);
+    this.friction = 0.01;
   }
   Tick(player,context){
     super.Tick();
