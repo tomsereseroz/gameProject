@@ -14,7 +14,7 @@ class basicGun{
     this.shotFriction = 0;
     this.shotStyle = "black";
     this.timeout = 180;
-    this.shotSound = new Audio("../assets/snap.mp3");
+    this.shotSound = new Audio("./assets/snap.mp3");
     this.shotSound.volume = 0.05;
   }
   canShoot(){return this.ticksToNextShot == 0;}
@@ -63,8 +63,8 @@ export class shotgun extends basicGun{
     this.damage = 8;
     this.delay = 50;
     this.shotSpread = 0.2;
-    this.shotSound = new Audio("../assets/shotgunBlast.mp3");
-    this.reloadSound = new Audio("../assets/shotgunCock.mp3");
+    this.shotSound = new Audio("./assets/shotgunBlast.mp3");
+    this.reloadSound = new Audio("./assets/shotgunCock.mp3");
     this.shotSound.volume = 0.5;
   }
   Shoot(pos, aim){

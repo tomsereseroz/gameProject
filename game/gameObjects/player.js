@@ -12,8 +12,8 @@ export default class Player extends Entity{
     this.health = 490;
     this.position = position;
     this.shape = new circle(40,this.position);
-    this.hurtSound = new Audio("../../assets/Oof.mp3");
-    this.shieldSound = new Audio('../../assets/shieldLoop.mp3');
+    this.hurtSound = new Audio("./assets/Oof.mp3");
+    this.shieldSound = new Audio('./assets/shieldLoop.mp3');
     this.shieldSound.loop = true;
     this.shieldEnergy = 200;
     this.shieldActivated = false;
@@ -102,7 +102,7 @@ export default class Player extends Entity{
 class Shield extends Entity{
   constructor(player){
     super();
-    this.hurtSound = new Audio('../../assets/shieldHit.mp3');
+    this.hurtSound = new Audio('./assets/shieldHit.mp3');
     this.velocity = player.velocity;
     this.aim = player.aim;
     this.health = 3000;

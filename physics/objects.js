@@ -84,7 +84,7 @@ export class Entity extends physObj{//entities are for things that aim in a cert
     this.aim = new Vector(0,0);//aim.x, .y
     this.health = 10;
     this.gun = undefined;
-    this.hurtSound = new Audio("../assets/hit.mp3");
+    this.hurtSound = new Audio("./assets/hit.mp3");
     this.hurtSound.volume = 0.5;
   }
   shootGun(){this.gun.Shoot({...this.position},this.aim.copy()); return this;}
