@@ -38,13 +38,13 @@ function createPauseMenu(){
 
   let mainMenuButton = document.createElement('button');
   mainMenuButton.setAttribute('id','mainMenuButton');
-  mainMenuButton.innerHTML = "Main Menu";
-  mainMenuButton.style.fontSize = '40px';
+  mainMenuButton.innerHTML = "Back to Website";
+  mainMenuButton.style.fontSize = '30px';
   mainMenuButton.style.margin = '5px';
-  mainMenuButton.style.padding = '5px';
+  mainMenuButton.style.padding = '5px 10px';
   mainMenuButton.onclick = ()=> { 
-    if(confirm("Are you sure you want to return to the main menu? your progress will be lost.")) 
-      location.reload();
+    if(confirm("Are you sure you want to return to the main website? your progress will be lost.")) 
+      window.open("../NeoSite/portfolio.php","_self");
   }
 
   let volumeControlDiv = document.createElement('div');

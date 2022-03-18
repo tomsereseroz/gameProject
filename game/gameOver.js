@@ -73,10 +73,10 @@ function displayGO(){
 function displayRestartOptions(){
   var a = document.createElement("button");
   a.style = "position:absolute; top:70%; right:70%; z-index:4; font-size: 40px; color: black; transform: translate(50%, -50%); font-family: Impact; user-select: none; border-color: black";
-  var node = document.createTextNode("Main Menu");
+  var node = document.createTextNode("Back to Website");
   a.appendChild(node);
   var stage = document.getElementById("stage");
-  a.onclick = ()=>{location.reload()};
+  a.onclick = ()=>{window.open("../NeoSite/portfolio.php","_self")};
   stage.appendChild(a);
   
   var b = document.createElement("button");
