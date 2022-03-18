@@ -1,26 +1,28 @@
-import physicsUtils from './physics/physicsUtils.js';
 import drawUtils from './game/drawingUtils.js';
 import Vector from './physics/vector.js';
-import {circle} from './physics/shapes.js';
 import position from './physics/position.js';
 import inputHandler from './interface/inputHandler.js';
-import {Entity, Player} from './physics/objects.js';
-import {gun} from './game/guns.js';
-import {objectHandler} from './game/objectArrays.js';
+import Player from './game/gameObjects/player.js';
+import {objectHandler} from './game/gameObjects/objectHandlers.js';
 import Position from './physics/position.js';
 import eventListeners from './interface/listeners.js';
-import {basicShooter, basicMelee} from './game/enemies.js';
+import {basicShooter, basicMelee, bigMelee} from './game/gameObjects/enemies.js';
+import hslWalker from './coolStuff/colorWalk.js';
+import {initializeUI, showPauseMenu, hidePauseMenu} from './interface/userInterface.js';
 
 console.log('game.js');
+
+initializeUI();
+showPauseMenu();
 
 let context = document.getElementById("gb").getContext("2d");
 let uicontext = document.getElementById("ui-layer").getContext("2d");
 let bgcontext = document.getElementById("background-layer").getContext("2d", { alpha: false });
 let contextArray = [bgcontext,context,uicontext];//ordered from background to foreground
 
-let numpads = 0;//number of connected gamepads
+let backGroundDrawer = new hslWalker(bgcontext);
 
-let eventListenerHandler = new eventListeners(contextArray,numpads);
+let eventListenerHandler = new eventListeners(contextArray,backGroundDrawer);
 let clientBox = eventListenerHandler.clientBox;//updates on window resize event
 
 let time = Date.now();
@@ -34,18 +36,19 @@ let oH = new objectHandler(contextArray,eventListenerHandler);
 let playerpos = new position(clientBox.width/2,clientBox.height/2);
 let player = new Player(oH.projectileHandler.playerArray,playerpos);
 
-oH.addEntity("player",player);
+oH.addPlayer(player);
 
 drawUtils.drawHPBar(player);
 
-let iH = new inputHandler(player,"gb");
+let iH = new inputHandler(player,"gb",oH);
 
 iH.gamePaused = true;
-
 
 loop();
 
 function loop(){
+  backGroundDrawer.draw(bgcontext);
+
   time = Date.now();
   
   if(iH.gamePaused||time-lasttime<msDelay){//this locks the game to run at [framerate] so it doesn't run too fast on 144hz+ monitors
@@ -66,18 +69,20 @@ function loop(){
 
   if(oH.entityHandler.enemyArray.length < 4){
     let enemy;
-    if(Math.random()<0.5){
+    let randomNumber = Math.random();
+    if(randomNumber < 0.3)
       enemy = new basicMelee;
-    }else{
+    else if(randomNumber > 0.5)
       enemy = new basicShooter(oH.projectileHandler.enemyArray);
-    }
+    else
+      enemy = new bigMelee(oH);
     enemy.position = new position(Math.random()*clientBox.width,Math.random()*clientBox.height);
     enemy.shape.position = enemy.position;
     while(Vector.differenceVector(player.position, enemy.position).magnitude<300){
       enemy.position = new Position(Math.random()*clientBox.width,Math.random()*clientBox.height);
       enemy.shape.position = enemy.position;
     };
-    oH.entityHandler.enemyArray[oH.entityHandler.enemyArray.length] = enemy;
+    oH.addEnemy(enemy);
   }
 
   window.requestAnimationFrame(loop);

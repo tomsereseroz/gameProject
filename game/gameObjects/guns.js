@@ -1,6 +1,5 @@
-
-import {Projectile} from '../physics/objects.js';
-import {circle} from '../physics/shapes.js';
+import {Projectile} from '../../physics/objects.js';
+import {circle} from '../../physics/shapes.js';
 
 
 class basicGun{
@@ -45,6 +44,9 @@ class basicGun{
     shot.shape.style = this.shotStyle;
     return shot;
   }
+  setVolume(volume){
+    this.shotSound.volume = 0.05*volume;
+  }
 }
 
 export class gun extends basicGun{
@@ -84,5 +86,9 @@ export class shotgun extends basicGun{
     super.Tick();
     if(this.ticksToNextShot==22)
       this.reloadSound.play();
+  }
+  setVolume(volume){
+    this.shotSound.volume = 0.5 * volume;
+    this.reloadSound.volume = volume;
   }
 }

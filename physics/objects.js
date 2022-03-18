@@ -2,7 +2,7 @@ import Position from './position.js';
 import Vector from './vector.js';
 import drawingUtils from '../game/drawingUtils.js';
 import { circle } from './shapes.js';
-import {gun, shotgun} from '../game/guns.js';
+import {gun, shotgun} from '../game/gameObjects/guns.js';
 
 export class Object{
   constructor(position=new Position(10,10),shape={},style='black'){
@@ -52,6 +52,17 @@ export class physObj extends Object{
     other.velocity = finalVelocity2;
     return this;
   }
+  bounce(other){
+    let differenceVector = Vector.differenceVector(this.position,other.position);
+    differenceVector = differenceVector.unitVector;
+    let massRatio = other.mass/this.mass;
+    massRatio = Math.min(massRatio, 3);
+    massRatio = Math.max(massRatio, 0.3)
+    this.velocity.x -= differenceVector.x*10*massRatio;
+    this.velocity.y -= differenceVector.y*10*massRatio;
+    other.velocity.x += differenceVector.x*10/massRatio;
+    other.velocity.y += differenceVector.y*10/massRatio;
+  }
 }
 
 export class Projectile extends physObj{//projectiles handle collision with entities
@@ -72,8 +83,7 @@ export class Entity extends physObj{//entities are for things that aim in a cert
     super();
     this.aim = new Vector(0,0);//aim.x, .y
     this.health = 10;
-    this.gun = 0;
-    this.moveFunction;
+    this.gun = undefined;
     this.hurtSound = new Audio("../assets/hit.mp3");
     this.hurtSound.volume = 0.5;
   }
@@ -99,41 +109,7 @@ export class Entity extends physObj{//entities are for things that aim in a cert
     if(this.position.y > context.canvas.height - 50)
       this.velocity.y -= this.position.y - context.canvas.height + 50;
   }
-}
-
-export class Player extends Entity{
-  constructor(projArray,position){
-    super();
-    this.gun = new shotgun(projArray);
-    this.mass = 10;
-    this.friction = 0.05;
-    this.health = 490;
-    this.position = position;
-    this.shape = new circle(40,this.position);
-    this.hurtSound = new Audio("./assets/Oof.mp3");
-  }
-  Tick(time,context){
-    super.Tick();
-    let playergrd = this.generatePlayerGradient(time,context);
-    this.shape.style = playergrd;
-    this.stayInBounds(context);
-  }
-  Draw(context){
-    super.Draw(context);
-    drawingUtils.drawAimIndicator(this,context);
-  }
-  generatePlayerGradient(time,context){
-    let playergrd = context.createRadialGradient(this.position.x, this.position.y, 5, this.position.x, this.position.y,40);
-    playergrd.addColorStop(0, "purple");
-    playergrd.addColorStop(.4+.3*Math.sin(2*time*Math.PI/2000), "black");
-    playergrd.addColorStop(.8+.1*Math.sin(2*time*Math.PI/3000), "red");
-    playergrd.addColorStop(.95+.05*Math.sin(2*time*Math.PI/600), "pink");
-    return playergrd;
-  }
-  applyDamage(source){
-    this.health-=source.damage; 
-    this.hurtSound.play();
-    drawingUtils.drawHPBar(this);
-    return this;
+  setVolume(volume){
+    this.hurtSound.volume = 0.5 * volume;
   }
 }

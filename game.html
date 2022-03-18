@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
-<head><!-- This is html for the 'head' (tab) of the browser  document.getElementById('pauseMenu')-->
+<head>
 	<title>Game Dev!</title>
-	<link rel="icon" href="./assets/40x36heart.png"/>
 </head>
 <script type='module' src="game.js"></script>
 <body>
@@ -11,14 +10,6 @@
 		<canvas id="ui-layer" width="480" height="320"></canvas>
 		<canvas id="game-layer" width="480" height="320"></canvas>
 		<canvas id="background-layer" width="480" height="320"></canvas>
-	</div>
-	<div id ="mainMenu">
-		<button type="button" onclick="this.parentElement.style = 'display:none;';">Adventure</button>
-		<button type="button" onclick="this.parentElement.style = 'display:none;';">Endless</button>
-	</div>
-	<div id ="pauseMenu">
-		<button type="button" onclick="this.parentElement.style = 'display:none;';" >Resume</button>
-		<button type="button" onclick="this.parentElement.style = 'display:none;';">Main Menu</button>
 	</div>
 	<div id="healthbar"><div id="health"></div></div>
 	<div id="score"><pre>Score: </pre><pre id="scorenum">0</pre></div>
@@ -46,16 +37,6 @@
   	}
 
 		canvas { position: absolute; }
-		#mainMenu, #pauseMenu, #score{ 
-			z-index: 4; 
-			position: absolute; 
-			display: flex;
-			flex-direction: column;
-			background-color:rgba(50,128,128,0.8);
-			top: 50%;
-			left: 50%;
-   		transform: translate(-50%, -50%);
-		}
 		#healthbar {
 			position:absolute;
 			width: 500px;
@@ -68,11 +49,15 @@
 			border-radius: 15px;
 		}
 		#score{
+			z-index: 4; 
+			position: absolute; 
+			display: flex;
 			flex-direction: row;
 			background-color: rgba(0,0,0,0.5);
 			border-radius: 15px;
 			padding: 10px;
 			color: blanchedalmond;
+			transform: translate(-50%, -50%);
 			top: 45px;
 			left: 150px;
 			font-size: 3em;

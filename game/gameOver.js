@@ -1,5 +1,6 @@
-export default function gameOver(contextArray){
+export default function gameOver(contextArray,volume){
   let wastedAudio = new Audio('../assets/wasted.mp3');
+  wastedAudio.volume = volume;
   wastedAudio.play();
   let svgObj = document.getElementById("svg-object");
   svgObj.setAttribute("style", "opacity: 1");

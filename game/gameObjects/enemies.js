@@ -1,8 +1,8 @@
-import { Entity } from '../physics/objects.js';
+import { Entity } from '../../physics/objects.js';
 import {gun} from './guns.js';
-import phUtils from '../physics/physicsUtils.js';
-import { circle } from '../physics/shapes.js';
-import Vector from '../physics/vector.js';
+import phUtils from '../../physics/physicsUtils.js';
+import { circle } from '../../physics/shapes.js';
+import Vector from '../../physics/vector.js';
 
 export class basicShooter extends Entity{
   constructor(projectileArray){
@@ -65,6 +65,11 @@ export class basicShooter extends Entity{
     this.aggroRange = 2000;
     return this;
   }
+  setVolume(volume){
+    if(this.gun.setVolume)
+      this.gun.setVolume(volume);
+    super.setVolume(volume);
+  }
 }
 
 export class basicMelee extends Entity{
@@ -102,5 +107,91 @@ export class basicMelee extends Entity{
     this.hurtSound.play();
     this.aggroRange = 2000;
     return this;
+  }
+}
+
+export class bigMelee extends Entity{
+  constructor(objectHandler){
+    super();
+    this.oH = objectHandler;
+    this.mass = 100;
+    this.maxHealth = 300;
+    this.health = 300;
+    this.shape = new circle(60);
+    this.damage = 80;
+    this.deathPath = "./assets/bleh.mp3"
+    this.ticksToMove = 80 + Math.floor(Math.random()*20);
+    this.friction = 0.01;
+  }
+  Tick(player,context){
+    super.Tick();
+    if(this.shape.isOnScreen(context))
+      this.shape.style = this.setStyle(context);
+
+    phUtils.aimAtCoords2(this,player.position);
+    if(this.ticksToMove==0){
+      this.velocity.x += this.aim.x*20;
+      this.velocity.y += this.aim.y*20;
+      this.ticksToMove = 30 + Math.floor(Math.random()*30);
+    }else
+      this.ticksToMove--;
+    this.stayInBounds(context);
+  }
+  setStyle(context){
+    let grd = context.createRadialGradient(this.position.x, this.position.y, 2,this.position.x,this.position.y,this.shape.radius);
+    grd.addColorStop(0, "green");
+    grd.addColorStop(this.health/(this.maxHealth+1), "purple");
+    grd.addColorStop(1, "black");
+    return grd;
+  }
+  applyDamage(source){
+    super.applyDamage(source);
+    if(this.health<=0){
+      for(let i=0;i<6;i++){
+        let enemy = new miniMelee;
+        enemy.position = this.position.copy();
+        enemy.position.x += Math.random()*25-12.5;
+        enemy.position.y += Math.random()*25-12.5;
+        enemy.shape.position = enemy.position;
+        this.oH.addEnemy(enemy);
+      }
+    }
+  return this;
+  }  
+}
+
+class miniMelee extends Entity{
+  constructor(){
+    super();
+    this.mass = 5;
+    this.maxHealth = 20;
+    this.health = 20;
+    this.shape = new circle(20);
+    this.damage = 5;
+    this.deathPath = "./assets/bleh.mp3"
+    this.ticksToMove = Math.floor(Math.random()*50);
+    this.friction = 0.1;
+  }
+  Tick(player,context){
+    super.Tick();
+    if(this.shape.isOnScreen(context))
+      this.shape.style = this.setStyle(context);
+
+    phUtils.aimAtCoords2(this,player.position);
+    if(this.ticksToMove==0){
+      this.velocity.x += this.aim.x*20;
+      this.velocity.y += this.aim.y*20;
+      let newTicksToMove = Math.floor(Math.random()*35);
+      this.ticksToMove = 15+newTicksToMove;
+    }else
+      this.ticksToMove--;
+    this.stayInBounds(context);
+  }
+  setStyle(context){
+    let grd = context.createRadialGradient(this.position.x, this.position.y, 2,this.position.x,this.position.y,this.shape.radius);
+    grd.addColorStop(0, "green");
+    grd.addColorStop(this.health/(this.maxHealth+1), "purple");
+    grd.addColorStop(1, "black");
+    return grd;
   }
 }

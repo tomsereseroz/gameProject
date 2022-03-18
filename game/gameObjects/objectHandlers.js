@@ -1,12 +1,13 @@
-import physicsUtils from '../physics/physicsUtils.js';
-import drawingUtils from '../game/drawingUtils.js';
-import Vector from '../physics/vector.js';
-import {Player} from '../physics/objects.js';
-import {basicShooter, basicMelee} from '../game/enemies.js';
-import gameOver from './gameOver.js';
+import physicsUtils from '../../physics/physicsUtils.js';
+import drawingUtils from '../drawingUtils.js';
+import Vector from '../../physics/vector.js';
+import Player from './player.js';
+import {basicShooter, basicMelee} from './enemies.js';
+import gameOver from '../gameOver.js';
 
 export class objectHandler{
   constructor(contextArray,eventListenerHandler){
+    this.globalVolume = 1;
     this.elh = eventListenerHandler;
     this.contextArray = contextArray;
     this.projectileHandler = new projectileHandler();
@@ -15,33 +16,30 @@ export class objectHandler{
   tick(time){
     if( this.projectileHandler.tick(this.entityHandler,this.contextArray[1]) || 
         this.entityHandler.tick(time,this.contextArray[1])){
-      gameOver(this.contextArray);
+      gameOver(this.contextArray,this.globalVolume);
       return true;
     }
     this.contextArray[1].clearRect(0, 0, this.elh.clientBox.width, this.elh.clientBox.height);
     this.draw();
     return false;
   }
-  addEntity(type,entity){
-    this.add(this.entityHandler,type,entity);
+  addPlayer(player){
+    player.setVolume(this.globalVolume);
+    let playerArray = this.entityHandler.playerArray;
+    playerArray[playerArray.length] = player;
   }
-  addProjectile(type,projectile){
-    this.add(this.projectileHandler,type,projectile);
+  addEnemy(enemy){
+    enemy.setVolume(this.globalVolume);
+    let enemyArray = this.entityHandler.enemyArray;
+    enemyArray[enemyArray.length] = enemy;
   }
-  add(handler,type,object){
-    let array;
-    switch(type){
-      case "enemy":
-        array = handler.enemyArray;
-        break;
-      case "player":
-        array = handler.playerArray;
-        break;
-      default:
-        console.log("invalid type given");
-        break;
-    }
-    array[array.length] = object;
+  addPlayerProjectile(projectile){
+    let playerArray = this.projectileHandler.playerArray;
+    playerArray[playerArray.length] = projectile;
+  }
+  addEnemyProjectile(projectile){
+    let enemyArray = this.projectileHandler.enemyArray;
+    enemyArray[enemyArray.length] = projectile;
   }
   draw(){
     this.drawArray(this.entityHandler.playerArray);
@@ -52,10 +50,24 @@ export class objectHandler{
   drawArray(array){
     for(let i = 0; i < array.length; i++) array[i].Draw(this.contextArray[1]);
   }
+  setVolume(volume){
+    this.globalVolume = volume;
+    this.projectileHandler.globalVolume = volume;
+    let arrays = [this.entityHandler.playerArray,
+                  this.entityHandler.enemyArray,
+                  this.projectileHandler.playerArray,
+                  this.projectileHandler.enemyArray];
+    arrays.forEach((array)=>{
+      for(let i = 0; i < array.length; i++) 
+        if(array[i].setVolume)
+          array[i].setVolume(volume);
+    })
+  }
 }
 
 class projectileHandler{
   constructor(){
+    this.globalVolume = 1;
     this.playerArray = [];
     this.enemyArray = [];
     //maybe add more arrays for multiple players in the future
@@ -72,15 +84,18 @@ class projectileHandler{
       if(projectile.isTimedOut()||!projectile.shape.isOnScreen(context)){
         deleted = true;
       }else{
-        for(var j = 0; j<entityArray.length; j++){
+        for(var j = entityArray.length-1; j>=0; j--){//loops from end to beginning because shield is at the end of the array
           let entity = entityArray[j];
           if(projectile.collidesWith(entity)){
             entity.applyDamage(projectile).absorbMomentum(projectile);
             if(entity.noHP()){
               if(entity instanceof Player) return true;
-              let deathSound = new Audio(entity.deathPath);
-              deathSound.play();
-              addToScore(entity.maxHealth);
+              if(entity.deathPath){
+                let deathSound = new Audio(entity.deathPath);
+                deathSound.volume = this.globalVolume;
+                deathSound.play();
+                addToScore(entity.maxHealth);
+              }
               entityArray.splice(j,1);
             }
             deleted = true;
@@ -111,19 +126,29 @@ class entityHandler{
       }
       for(var j = 0; j < this.playerArray.length; j++){
         let player = this.playerArray[j];
-        if(ent1.collidesWith(player)) handleEntityCollision(ent1, player);
-        if(player.noHP()) return true;
+        if(ent1.collidesWith(player)){
+          physicsUtils.moveApart(ent1,player);
+          handleEntityCollision(ent1, player);
+        }
+        if(player.noHP()){
+          if(player instanceof Player)
+            return true;
+          this.playerArray.splice(j,1);
+        } 
       }
       ent1.Tick(this.playerArray[0],context);
     }
-    for(var i = 0; i < this.playerArray.length; i++ )
+    for(var i = 0; i < this.playerArray.length; i++ ){
       this.playerArray[i].Tick(time,context);
+      if(this.playerArray[i].noHP())
+        this.playerArray.splice(i,1);
+    }
     return false;
   }
 }
 
 function handleEntityCollision(object1,object2){
-  object1.tradeMomentum(object2);
+  object1.bounce(object2);
   if(object1.damage)
     damageObject(object1,object2);
   if(object2.damage)
