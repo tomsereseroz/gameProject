@@ -6,7 +6,7 @@ export default class mouseInterface{
     this.mousePosition = new Position(0,0);
     this.mouseDown = false;
     this.rightMouseDown = false;
-    document.onmousedown = (e) => {
+    document.onmousedown = (e) => {//e meaning event
       if(e.button==0)this.mouseDown = true;
       if(e.button==2)this.rightMouseDown = true;
     };//button 0 is left click, 2 is right click

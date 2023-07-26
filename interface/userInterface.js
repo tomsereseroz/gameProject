@@ -35,6 +35,7 @@ function createPauseMenu(){
   resumeButton.style.margin = '5px';
   resumeButton.style.padding = '5px';
   resumeButton.onclick = hidePauseMenu;
+  pauseMenuDiv.appendChild(resumeButton);
 
   let mainMenuButton = document.createElement('button');
   mainMenuButton.setAttribute('id','mainMenuButton');
@@ -47,6 +48,7 @@ function createPauseMenu(){
       window.open("../NeoSite/portfolio.php","_self");
   }
 
+
   let volumeControlDiv = document.createElement('div');
   volumeControlDiv.innerHTML = "Volume:";
   volumeControlDiv.style.display = 'flex';
@@ -54,6 +56,8 @@ function createPauseMenu(){
   volumeControlDiv.style.textAlign = 'center';
   volumeControlDiv.style.margin = '5px';
   volumeControlDiv.style.fontSize = '1.5em';
+  pauseMenuDiv.appendChild(volumeControlDiv);
+  pauseMenuDiv.appendChild(mainMenuButton);
 
   let volumeSlider = document.createElement('input');
   volumeSlider.setAttribute('id','volumeSlider');
@@ -63,9 +67,47 @@ function createPauseMenu(){
   volumeSlider.value = 10;
   volumeControlDiv.appendChild(volumeSlider);
   
-  pauseMenuDiv.appendChild(resumeButton);
-  pauseMenuDiv.appendChild(volumeControlDiv);
-  pauseMenuDiv.appendChild(mainMenuButton);
+  let inputSelectDiv = document.createElement('div');
+  inputSelectDiv.style.textAlign = 'center';
+  inputSelectDiv.style.whiteSpace = 'nowrap';
+  let inputText = document.createElement('p');
+  inputText.innerHTML = 'Input type';
+  inputSelectDiv.appendChild(inputText);
+
+  let radioMouse = document.createElement('input');
+  radioMouse.setAttribute('id','rMouse');//use document.getElementByID("").checked==true to query.
+  radioMouse.setAttribute('type','radio');
+  radioMouse.setAttribute('name','input');
+  let mouselabel = document.createElement('label');
+  mouselabel.setAttribute('for','rMouse');
+  mouselabel.innerHTML = " mouse + keyboard";
+  inputSelectDiv.appendChild(radioMouse);
+  inputSelectDiv.appendChild(mouselabel);
+  
+  let radioGamepad = document.createElement('input');
+  radioGamepad.setAttribute('id','rGamepad');
+  radioGamepad.setAttribute('type','radio');
+  radioGamepad.setAttribute('name','input');
+  let GPlabel = document.createElement('label');
+  GPlabel.setAttribute('for','rGamepad');
+  GPlabel.innerHTML = " Gamepad (controller)";
+  inputSelectDiv.appendChild(document.createElement('br'));
+  inputSelectDiv.appendChild(radioGamepad);
+  inputSelectDiv.appendChild(GPlabel);
+
+  let radioTouch = document.createElement('input');
+  radioTouch.setAttribute('id','rTouch');
+  radioTouch.setAttribute('type','radio');
+  radioTouch.setAttribute('name','input');
+  let touchlabel = document.createElement('label');
+  touchlabel.setAttribute('for','rTouch');
+  touchlabel.innerHTML = " Touchscreen";
+  inputSelectDiv.appendChild(document.createElement('br'));
+  inputSelectDiv.appendChild(radioTouch);
+  inputSelectDiv.appendChild(touchlabel);
+  
+  pauseMenuDiv.appendChild(inputSelectDiv);
+
 
   document.body.appendChild(pauseMenuDiv);
 }

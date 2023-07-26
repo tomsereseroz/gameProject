@@ -81,7 +81,7 @@ function displayRestartOptions(){
   
   var b = document.createElement("button");
   b.style = "position:absolute; top:70%; right:30%; z-index:4; font-size: 40px; color: black; transform: translate(50%, -50%); font-family: Impact; user-select: none; border-color: black";
-  var node = document.createTextNode("Restart");
+  var node = document.createTextNode("Play again");
   b.appendChild(node);
   var stage = document.getElementById("stage");
   b.onclick = ()=>{location.reload()};

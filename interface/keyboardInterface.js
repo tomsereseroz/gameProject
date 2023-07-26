@@ -1,7 +1,7 @@
 export default class keyboardInterface{
   constructor(){
     this.codeMap = [];//map at 'code' = true if key with matching code is pressed down
-    this.callbackMap = {};//kinda fucked up implementation but callbackmap is an object with named arrays.
+    this.callbackMap = {};//callbackmap is an object with named arrays.
     //current usage is callbackmap["code"] = [callbackFunction, firstArgument]
     window.onkeydown = (event)=>{
       if(this.codeMap[event.code] != undefined)
